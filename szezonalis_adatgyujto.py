@@ -26,6 +26,7 @@ import os
 import pathlib
 import sys
 import tempfile
+import time
 import traceback
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
@@ -45,6 +46,7 @@ PARHUZAMOS = int(os.environ.get("PARHUZAMOS", "4"))  # egyszerre futó CDS/EWDS 
 # A szezonális GloFAS "operational" jelenleg a v4-es modell (a v4 reanalízis egyezik az előrejelzés 1. napjával)
 GLOFAS_KLIMA_VERZIO = os.environ.get("GLOFAS_KLIMA_VERZIO", "version_4_0")
 GLOFAS_NAP_LEPES = int(os.environ.get("GLOFAS_NAP_LEPES", "3"))  # 1 = minden nap (lassabb: 30 kérés)
+GLOFAS_KLIMA_TURELEM_PERC = float(os.environ.get("GLOFAS_KLIMA_TURELEM_PERC", "150"))  # ennyit vár az EWDS sorára
 
 PONTOK = [  # név, szélesség, hosszúság, régiócsoport
     ("Győr", 47.68, 17.63, "NYUGAT"),
@@ -325,67 +327,167 @@ def legnagyobb_folyo_cella(da_mean: xr.DataArray, lat: float, lon: float, latn: 
     return float(ablak[latn].values[idx[ablak.dims.index(latn)]]), float(ablak[lonn].values[idx[ablak.dims.index(lonn)]])
 
 
+def _folyo_ablak(da: xr.DataArray, lat: float, lon: float, latn: str, lonn: str) -> xr.DataArray:
+    return da.sel({latn: slice(lat + 0.12, lat - 0.12) if da[latn][0] > da[latn][-1] else slice(lat - 0.12, lat + 0.12),
+                   lonn: slice(lon - 0.12, lon + 0.12)})
+
+
+def _glofas_csomag_osszegzes(da: xr.DataArray) -> dict:
+    """Egy letöltött csomagból folyónként a cella-ablak havi összegei és darabszámai (kis JSON, commitolható)."""
+    latn, lonn = lat_lon(da)
+    tdim = dim_nev(da, ("valid_time", "time"))
+    ki = {}
+    for f, s, la, lo in FOLYOK:
+        w = _folyo_ablak(da, la, lo, latn, lonn)
+        honap = w[tdim].dt.month.rename("honap")
+        osszeg = w.fillna(0).groupby(honap).sum(tdim).reindex(honap=range(1, 13), fill_value=0)
+        db = w.notnull().groupby(honap).sum(tdim).reindex(honap=range(1, 13), fill_value=0)
+        ki[f"{f}|{s}"] = {"lat": [round(float(x), 4) for x in w[latn].values], "lon": [round(float(x), 4) for x in w[lonn].values],
+                          "osszeg": np.round(osszeg.transpose("honap", latn, lonn).values.astype(float), 3).tolist(),
+                          "db": db.transpose("honap", latn, lonn).values.astype(int).tolist()}
+    return ki
+
+
 def glofas_klima(cl) -> dict:
+    """GloFAS 1991–2020 havi klíma folyónként.
+
+    Az EWDS kérésenként max. 500 mezőt enged, felhasználónként egyszerre egy kérést futtat, és a MARS-archívum
+    sora néha órás. Ezért: minden GLOFAS_NAP_LEPES. nap (alapból 3.), több év/kérés; a kéréseket beküldjük, a
+    job-azonosítókat és a kész csomagok összegzését az adat/cache/glofas_reszek/ mappába mentjük. Ha a türelmi idő
+    lejár, kivételt dobunk (a vízhozam-rész klíma nélkül készül el), a következő futás pedig innen folytatja.
+    """
     gy = CACHE / "glofas_klima_1991_2020.json"
     if gy.exists():
         return json.loads(gy.read_text(encoding="utf-8"))
     naplo("GloFAS klíma számítása (egyszeri, utána cache-ből)…")
     alap = glofas_valtozo(cl, "cems-glofas-historical", {"year": ["2000"]}, verzio=GLOFAS_KLIMA_VERZIO)
     verzio = alap.get("system_version", ["?"])[0]
-    # Az EWDS kérésenként max. 500 mezőt enged (1 év napi adata = 365), és felhasználónként egyszerre egy kérést
-    # futtat. Ezért minden GLOFAS_NAP_LEPES. napot vesszük (alapból 3: 1., 4., …, 31.), így több év fér egy kérésbe.
-    napok = list(range(1, 32, GLOFAS_NAP_LEPES))
+    napok = [f"{d:02d}" for d in range(1, 32, GLOFAS_NAP_LEPES)]
     evek_kereskent = max(1, 480 // (len(napok) * 12))
     csomagok = [list(range(e, min(e + evek_kereskent, 2021))) for e in range(1991, 2021, evek_kereskent)]
-    reszdir = CACHE / "glofas_reszek"  # részeredmények: megszakítás után innen folytatja
+    reszdir = CACHE / "glofas_reszek"
     reszdir.mkdir(parents=True, exist_ok=True)
+    allapot_f = reszdir / "jobok.json"
+    jobok = json.loads(allapot_f.read_text(encoding="utf-8")) if allapot_f.exists() else {}
 
-    def csomag(evek: list[int]) -> pathlib.Path:
-        f = reszdir / f"gh_{GLOFAS_NAP_LEPES}_{evek[0]}_{evek[-1]}.nc"
-        if f.exists():
-            return f
-        keres = dict(alap, year=[str(e) for e in evek], month=[f"{m:02d}" for m in range(1, 13)],
-                     day=[f"{d:02d}" for d in napok], area=FOLYO_AREA, data_format="netcdf",
-                     download_format="unarchived")
-        with tempfile.TemporaryDirectory() as tmp:
-            da = adatvaltozo(megnyit(letolt(cl, "cems-glofas-historical", keres, pathlib.Path(tmp) / "gh.nc"))).load()
-        ideig = f.with_suffix(".tmp")
-        da.to_netcdf(ideig)
-        ideig.rename(f)
-        naplo(f"GloFAS historical {evek[0]}–{evek[-1]} kész")
-        return f
+    def kulcs(evek):
+        return f"{verzio}_{GLOFAS_NAP_LEPES}_{evek[0]}_{evek[-1]}"
 
-    with ThreadPoolExecutor(PARHUZAMOS) as ex:
-        fajlok = list(ex.map(csomag, csomagok))
-    reszek = [xr.open_dataarray(f).load() for f in fajlok]
-    tdim = dim_nev(reszek[0], ("valid_time", "time"))
-    da = xr.concat(reszek, dim=tdim)
-    latn, lonn = lat_lon(da)
-    atlag = da.mean(tdim)
+    def keres(evek):
+        return dict(alap, year=[str(e) for e in evek], month=[f"{m:02d}" for m in range(1, 13)], day=napok,
+                    area=FOLYO_AREA, data_format="netcdf", download_format="unarchived")
+
+    def mentes():
+        allapot_f.write_text(json.dumps(jobok, indent=1), encoding="utf-8")
+
+    # Korábbi (pl. megszakadt) futás még sorban álló, azonos kéréseinek átvétele
+    try:
+        hianyzo_kulcsok = {kulcs(c): c for c in csomagok if kulcs(c) not in jobok}
+        if hianyzo_kulcsok:
+            for job in cl.get_jobs(limit=50, sortby="-created", status=["accepted", "running", "successful"]).json["jobs"]:
+                if job.get("processID") != "cems-glofas-historical":
+                    continue
+                req = cl.get_remote(job["jobID"]).request
+                for k, c in hianyzo_kulcsok.items():
+                    if k not in jobok and _lista(req.get("year")) == [str(e) for e in c] \
+                            and _lista(req.get("day")) == napok and _lista(req.get("system_version")) == [verzio] \
+                            and [float(x) for x in req.get("area", [])] == [float(x) for x in FOLYO_AREA]:
+                        jobok[k] = job["jobID"]
+                        naplo(f"GloFAS historical {c[0]}–{c[-1]}: korábbi kérés átvéve ({job['status']})")
+            mentes()
+    except Exception as e:
+        naplo(f"Korábbi GloFAS kérések lekérdezése nem sikerült: {e!r:.200}")
+
+    hatarido = dt.datetime.now() + dt.timedelta(minutes=GLOFAS_KLIMA_TURELEM_PERC)
+    probalkozas: dict[str, int] = {}
+    while True:
+        hianyzo = [c for c in csomagok if not (reszdir / f"{kulcs(c)}.json").exists()]
+        if not hianyzo:
+            break
+        for c in hianyzo:
+            k = kulcs(c)
+            allapot = "nincs"
+            if k in jobok:
+                try:
+                    remote = cl.get_remote(jobok[k])
+                    allapot = remote.status
+                except Exception:
+                    allapot = "nincs"
+            if allapot in ("accepted", "running"):
+                continue
+            if allapot == "successful":
+                with tempfile.TemporaryDirectory() as tmp:
+                    cel = pathlib.Path(tmp) / "gh.nc"
+                    remote.download(str(cel))
+                    if zipfile.is_zipfile(cel):
+                        with zipfile.ZipFile(cel) as z:
+                            nev = next(n for n in z.namelist() if n.endswith((".nc", ".grib", ".grib2")))
+                            cel = cel.with_name(pathlib.Path(nev).name)
+                            cel.write_bytes(z.read(nev))
+                    da = adatvaltozo(megnyit(cel)).load()
+                (reszdir / f"{k}.json").write_text(json.dumps(_glofas_csomag_osszegzes(da)), encoding="utf-8")
+                naplo(f"GloFAS historical {c[0]}–{c[-1]} kész")
+                continue
+            # nincs még kérés, vagy elbukott / törölték: (újra)beküldés
+            probalkozas[k] = probalkozas.get(k, 0) + 1
+            if probalkozas[k] > 3:
+                raise RuntimeError(f"GloFAS historical {c[0]}–{c[-1]}: a kérés többször is elbukott ({allapot})")
+            if allapot != "nincs":
+                naplo(f"GloFAS historical {c[0]}–{c[-1]}: állapot {allapot}, újraküldöm")
+            jobok[k] = cl.submit("cems-glofas-historical", keres(c)).request_id
+            mentes()
+            naplo(f"GloFAS historical {c[0]}–{c[-1]} beküldve")
+        if dt.datetime.now() > hatarido:
+            kesz = len(csomagok) - len(hianyzo)
+            raise RuntimeError(f"GloFAS klíma még nem készült el ({kesz}/{len(csomagok)} csomag kész, a többi kérés "
+                               f"az EWDS sorában áll); a következő futás innen folytatja")
+        time.sleep(60)
+
+    # Összesítés: a cella a 30 éves átlag alapján a legnagyobb vízhozamú cella az ablakban
+    reszek = [json.loads((reszdir / f"{kulcs(c)}.json").read_text(encoding="utf-8")) for c in csomagok]
     cellak, havi = {}, {}
-    for f, s, la, lo in FOLYOK:
+    for f, s, _, _ in FOLYOK:
         k = f"{f}|{s}"
-        cellak[k] = legnagyobb_folyo_cella(atlag, la, lo, latn, lonn)
-        ts = da.sel({latn: cellak[k][0], lonn: cellak[k][1]}, method="nearest").to_series()
-        hm = ts.groupby(ts.index.month).mean()
-        havi[k] = [round(float(hm.get(m, np.nan)), 1) for m in range(1, 13)]
+        osszeg = sum(np.array(r_[k]["osszeg"], dtype=float) for r_ in reszek)
+        db = sum(np.array(r_[k]["db"], dtype=float) for r_ in reszek)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            atlag = np.where(db.sum(0) > 0, osszeg.sum(0) / db.sum(0), np.nan)
+            havi_atl = np.where(db > 0, osszeg / db, np.nan)
+        i, j = np.unravel_index(np.nanargmax(atlag), atlag.shape)
+        cellak[k] = [reszek[0][k]["lat"][i], reszek[0][k]["lon"][j]]
+        havi[k] = [round(float(x), 1) for x in havi_atl[:, i, j]]
+    napszam = int(sum(np.array(r_[f"{FOLYOK[0][0]}|{FOLYOK[0][1]}"]["db"]).max(axis=(1, 2)).sum() for r_ in reszek))
     klima = {"verzio": verzio, "cellak": cellak, "havi_atlag": havi,
-             "mintavetel": f"minden {GLOFAS_NAP_LEPES}. nap, {da.sizes[tdim]} nap 1991–2020"}
+             "mintavetel": f"minden {GLOFAS_NAP_LEPES}. nap, {napszam} nap 1991–2020"}
     gy.write_text(json.dumps(klima, ensure_ascii=False, indent=1), encoding="utf-8")
-    for f in fajlok:
-        f.unlink(missing_ok=True)
+    for f in reszdir.iterdir():
+        f.unlink()
+    reszdir.rmdir()
     return klima
 
 
 def glofas_szezonalis(ev: int, ho: int) -> list:
     cl = kliens(EWDS_URL, ["EWDS_KEY", "CDS_KEY", "CDSAPI_KEY"])
-    klima = glofas_klima(cl)
+    # Előbb az előrejelzés (havonta kell), utána a klíma (egyszeri): az EWDS felhasználónként egyszerre
+    # egy kérést futtat, így a klíma-kérések nem tartják fel az előrejelzést.
     alap = glofas_valtozo(cl, "cems-glofas-seasonal", {"year": [str(ev)], "month": [f"{ho:02d}"]})
-    keres = dict(alap, year=[str(ev)], month=[f"{ho:02d}"],
-                 leadtime_hour=[str(h) for h in range(24, 24 * 216, 24)], area=FOLYO_AREA,
-                 data_format="netcdf", download_format="unarchived")
+    lepesek = list(range(24, 24 * 216, 24))  # 1–215. nap
+    darab = 108  # az EWDS kérésenként max. 150 előretekintési lépést enged
+    reszek = []
     with tempfile.TemporaryDirectory() as tmp:
-        da = adatvaltozo(megnyit(letolt(cl, "cems-glofas-seasonal", keres, pathlib.Path(tmp) / "gs.nc"))).load()
+        for i in range(0, len(lepesek), darab):
+            keres = dict(alap, year=[str(ev)], month=[f"{ho:02d}"],
+                         leadtime_hour=[str(h) for h in lepesek[i:i + darab]], area=FOLYO_AREA,
+                         data_format="netcdf", download_format="unarchived")
+            reszek.append(adatvaltozo(megnyit(letolt(cl, "cems-glofas-seasonal", keres,
+                                                     pathlib.Path(tmp) / f"gs_{i}.nc"))).load())
+    elso_dim = dim_nev(reszek[0], ("forecast_period", "step", "valid_time", "time"))
+    da = xr.concat(reszek, dim=elso_dim) if len(reszek) > 1 else reszek[0]
+    try:
+        klima = glofas_klima(cl)
+    except Exception as e:  # a vízhozam-előrejelzés klíma nélkül is elkészül (klímához viszonyított mezők = null)
+        hiba("GloFAS klíma", e)
+        klima = {"cellak": {}, "havi_atlag": {}}
     latn, lonn = lat_lon(da)
     tag = dim_nev(da, ("number", "realization", "member"))
     tdim = dim_nev(da, ("valid_time", "time", "step", "forecast_period"))
@@ -410,7 +512,8 @@ def glofas_szezonalis(ev: int, ho: int) -> list:
                 if len(g) < calendar.monthrange(vev, vho)[1] - 1:
                     continue  # csak teljes hónap
                 tagatlag = g.mean().values
-                kl = klima["havi_atlag"][k][vho - 1]
+                kl = (klima["havi_atlag"].get(k) or [None] * 12)[vho - 1]
+                kl = kl if kl is not None and np.isfinite(kl) else None
                 med = float(np.nanmedian(tagatlag))
                 sorok.append({
                     "folyo": f, "szelveny": s, "honap": f"{vev}-{vho:02d}",
@@ -425,8 +528,9 @@ def glofas_szezonalis(ev: int, ho: int) -> list:
             hiba(f"GloFAS {k}", e)
     FORRASOK.append({"forras_id": "F-GLOFAS", "nev": "GloFAS szezonális vízhozam-előrejelzés (CEMS)",
                      "dataset": "cems-glofas-seasonal", "parameterek": alap, "inicializalas": f"{ev}-{ho:02d}",
-                     "klima": f"cems-glofas-historical {klima.get('verzio')} 1991–2020"
-                              + (f" ({klima['mintavetel']})" if klima.get("mintavetel") else ""),
+                     "klima": (f"cems-glofas-historical {klima.get('verzio')} 1991–2020"
+                               + (f" ({klima['mintavetel']})" if klima.get("mintavetel") else ""))
+                              if klima.get("havi_atlag") else "nem elérhető (lásd meta.hibak)",
                      "licenc": "CEMS-FLOODS datasets licence",
                      "attribucio": "Copernicus Emergency Management Service – GloFAS"})
     return sorok
