@@ -78,7 +78,7 @@ FORRASOK: list[dict] = []
 
 
 def naplo(msg: str) -> None:
-    print(f"[{dt.datetime.utcnow():%H:%M:%S}] {msg}", flush=True)
+    print(f"[{dt.datetime.now(dt.timezone.utc).replace(tzinfo=None):%H:%M:%S}] {msg}", flush=True)
 
 
 def hiba(resz: str, exc: BaseException | str) -> None:
@@ -569,7 +569,7 @@ def ens_heti(cl_cds, letolto=ens_letolt) -> list:
 
 # --------------------------------------------------------------------------- futtatás
 def main() -> int:
-    most = dt.datetime.utcnow()
+    most = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
     ev, ho = int(os.environ.get("INIT_EV", most.year)), int(os.environ.get("INIT_HO", most.month))
     ki = {"meta": {}, "havi": [], "havi_rendszerenkent": [], "heti": [], "vizhozam": []}
     reszek = {}
