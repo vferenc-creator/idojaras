@@ -1,0 +1,2708 @@
+{
+ "meta": {
+  "riport": "Energofish szezonális numerikus adatréteg",
+  "sema_verzio": "1.0",
+  "inicializalas_honap": "2026-10",
+  "generalva_utc": "2026-11-05T13:17:01Z",
+  "reszek_sikeresek": {
+   "havi": true,
+   "vizhozam": true,
+   "heti": true
+  },
+  "pontok": [
+   {
+    "nev": "Győr",
+    "lat": 47.68,
+    "lon": 17.63,
+    "regio": "NYUGAT"
+   },
+   {
+    "nev": "Siófok (Balaton)",
+    "lat": 46.91,
+    "lon": 18.05,
+    "regio": "NYUGAT"
+   },
+   {
+    "nev": "Pécs",
+    "lat": 46.07,
+    "lon": 18.23,
+    "regio": "NYUGAT"
+   },
+   {
+    "nev": "Budapest",
+    "lat": 47.5,
+    "lon": 19.04,
+    "regio": "KOZEP_ESZAK"
+   },
+   {
+    "nev": "Miskolc",
+    "lat": 48.1,
+    "lon": 20.78,
+    "regio": "KOZEP_ESZAK"
+   },
+   {
+    "nev": "Szeged",
+    "lat": 46.25,
+    "lon": 20.15,
+    "regio": "ALFOLD"
+   },
+   {
+    "nev": "Debrecen",
+    "lat": 47.53,
+    "lon": 21.63,
+    "regio": "ALFOLD"
+   }
+  ],
+  "megjegyzes": "Az anomáliák a modellek saját hindcast-klímájához (C3S), a GloFAS 1991–2020 reanalízishez, illetve az ERA5 1991–2020 klímához (ENS) viszonyítanak. Az elotav_honap 0 = az indítás hónapja.",
+  "adatforrasok": [
+   {
+    "forras_id": "F-C3S",
+    "nev": "Copernicus C3S multi-modell szezonális előrejelzés",
+    "dataset": "seasonal-postprocessed-single-levels",
+    "rendszerek": [
+     "ecmwf:51",
+     "ukmo:610",
+     "meteo_france:9",
+     "dwd:22",
+     "cmcc:4",
+     "ncep:2",
+     "jma:4",
+     "eccc:5",
+     "bom:2"
+    ],
+    "inicializalas": "2026-10",
+    "licenc": "Copernicus licence (C3S)",
+    "attribucio": "Generated using Copernicus Climate Change Service information"
+   },
+   {
+    "forras_id": "F-GLOFAS",
+    "nev": "GloFAS szezonális vízhozam-előrejelzés (CEMS)",
+    "dataset": "cems-glofas-seasonal",
+    "parameterek": {
+     "variable": [
+      "river_discharge_in_the_last_24_hours"
+     ],
+     "system_version": [
+      "operational"
+     ],
+     "hydrological_model": [
+      "lisflood"
+     ]
+    },
+    "inicializalas": "2026-10",
+    "klima": "cems-glofas-historical version_4_0 1991–2020 (minden 3. nap, 3810 nap 1991–2020)",
+    "licenc": "CEMS-FLOODS datasets licence",
+    "attribucio": "Copernicus Emergency Management Service – GloFAS"
+   },
+   {
+    "forras_id": "F-ENS",
+    "nev": "ECMWF nyílt ENS (50 tag, 15 nap)",
+    "inicializalas": "2026-11-05 00 UTC",
+    "modszer": "Nyers ensemble a ERA5 1991–2020 napi klímához (00/12 UTC) mérve; modellhiba nincs korrigálva",
+    "licenc": "CC BY 4.0 (ECMWF open data); ERA5: Copernicus licence",
+    "attribucio": "ECMWF open data; Copernicus Climate Change Service (ERA5)"
+   }
+  ],
+  "hibak": []
+ },
+ "havi": [
+  {
+   "honap": "2026-10",
+   "elotav_honap": 0,
+   "terulet": "Magyarország",
+   "valtozo": "homerseklet",
+   "anomalia": 1.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.82,
+   "p_atlag_alatt": 0.18,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-10",
+   "elotav_honap": 0,
+   "terulet": "NYUGAT",
+   "valtozo": "homerseklet",
+   "anomalia": 1.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.83,
+   "p_atlag_alatt": 0.17,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-10",
+   "elotav_honap": 0,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "homerseklet",
+   "anomalia": 1.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.81,
+   "p_atlag_alatt": 0.19,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-10",
+   "elotav_honap": 0,
+   "terulet": "ALFOLD",
+   "valtozo": "homerseklet",
+   "anomalia": 1.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.82,
+   "p_atlag_alatt": 0.18,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-11",
+   "elotav_honap": 1,
+   "terulet": "Magyarország",
+   "valtozo": "homerseklet",
+   "anomalia": 1.3,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.76,
+   "p_atlag_alatt": 0.24,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-11",
+   "elotav_honap": 1,
+   "terulet": "NYUGAT",
+   "valtozo": "homerseklet",
+   "anomalia": 1.3,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.77,
+   "p_atlag_alatt": 0.23,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-11",
+   "elotav_honap": 1,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "homerseklet",
+   "anomalia": 1.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "p_atlag_alatt": 0.25,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-11",
+   "elotav_honap": 1,
+   "terulet": "ALFOLD",
+   "valtozo": "homerseklet",
+   "anomalia": 1.3,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "p_atlag_alatt": 0.25,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-12",
+   "elotav_honap": 2,
+   "terulet": "Magyarország",
+   "valtozo": "homerseklet",
+   "anomalia": 1.4,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.74,
+   "p_atlag_alatt": 0.26,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-12",
+   "elotav_honap": 2,
+   "terulet": "NYUGAT",
+   "valtozo": "homerseklet",
+   "anomalia": 1.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "p_atlag_alatt": 0.25,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-12",
+   "elotav_honap": 2,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "homerseklet",
+   "anomalia": 1.4,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.73,
+   "p_atlag_alatt": 0.27,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-12",
+   "elotav_honap": 2,
+   "terulet": "ALFOLD",
+   "valtozo": "homerseklet",
+   "anomalia": 1.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.74,
+   "p_atlag_alatt": 0.26,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-01",
+   "elotav_honap": 3,
+   "terulet": "Magyarország",
+   "valtozo": "homerseklet",
+   "anomalia": 1.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "p_atlag_alatt": 0.25,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-01",
+   "elotav_honap": 3,
+   "terulet": "NYUGAT",
+   "valtozo": "homerseklet",
+   "anomalia": 1.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "p_atlag_alatt": 0.25,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-01",
+   "elotav_honap": 3,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "homerseklet",
+   "anomalia": 1.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.74,
+   "p_atlag_alatt": 0.26,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-01",
+   "elotav_honap": 3,
+   "terulet": "ALFOLD",
+   "valtozo": "homerseklet",
+   "anomalia": 1.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.76,
+   "p_atlag_alatt": 0.24,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-02",
+   "elotav_honap": 4,
+   "terulet": "Magyarország",
+   "valtozo": "homerseklet",
+   "anomalia": 1.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "p_atlag_alatt": 0.25,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-02",
+   "elotav_honap": 4,
+   "terulet": "NYUGAT",
+   "valtozo": "homerseklet",
+   "anomalia": 1.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "p_atlag_alatt": 0.25,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-02",
+   "elotav_honap": 4,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "homerseklet",
+   "anomalia": 1.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.73,
+   "p_atlag_alatt": 0.27,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-02",
+   "elotav_honap": 4,
+   "terulet": "ALFOLD",
+   "valtozo": "homerseklet",
+   "anomalia": 1.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "p_atlag_alatt": 0.25,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-03",
+   "elotav_honap": 5,
+   "terulet": "Magyarország",
+   "valtozo": "homerseklet",
+   "anomalia": 1.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.71,
+   "p_atlag_alatt": 0.29,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-03",
+   "elotav_honap": 5,
+   "terulet": "NYUGAT",
+   "valtozo": "homerseklet",
+   "anomalia": 1.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.71,
+   "p_atlag_alatt": 0.29,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-03",
+   "elotav_honap": 5,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "homerseklet",
+   "anomalia": 1.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.72,
+   "p_atlag_alatt": 0.28,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 9,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-03",
+   "elotav_honap": 5,
+   "terulet": "ALFOLD",
+   "valtozo": "homerseklet",
+   "anomalia": 1.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.7,
+   "p_atlag_alatt": 0.3,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 8,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-10",
+   "elotav_honap": 0,
+   "terulet": "Magyarország",
+   "valtozo": "csapadek",
+   "anomalia": -11.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.34,
+   "p_atlag_alatt": 0.66,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 0,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-10",
+   "elotav_honap": 0,
+   "terulet": "NYUGAT",
+   "valtozo": "csapadek",
+   "anomalia": -9.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.35,
+   "p_atlag_alatt": 0.65,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 0,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-10",
+   "elotav_honap": 0,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "csapadek",
+   "anomalia": -13.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.32,
+   "p_atlag_alatt": 0.68,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 0,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-10",
+   "elotav_honap": 0,
+   "terulet": "ALFOLD",
+   "valtozo": "csapadek",
+   "anomalia": -11.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.35,
+   "p_atlag_alatt": 0.65,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 0,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-11",
+   "elotav_honap": 1,
+   "terulet": "Magyarország",
+   "valtozo": "csapadek",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.52,
+   "p_atlag_alatt": 0.48,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 6,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-11",
+   "elotav_honap": 1,
+   "terulet": "NYUGAT",
+   "valtozo": "csapadek",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.52,
+   "p_atlag_alatt": 0.48,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 5,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-11",
+   "elotav_honap": 1,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "csapadek",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.53,
+   "p_atlag_alatt": 0.47,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 6,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-11",
+   "elotav_honap": 1,
+   "terulet": "ALFOLD",
+   "valtozo": "csapadek",
+   "anomalia": 5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.52,
+   "p_atlag_alatt": 0.48,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 6,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-12",
+   "elotav_honap": 2,
+   "terulet": "Magyarország",
+   "valtozo": "csapadek",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.54,
+   "p_atlag_alatt": 0.46,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 5,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-12",
+   "elotav_honap": 2,
+   "terulet": "NYUGAT",
+   "valtozo": "csapadek",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.54,
+   "p_atlag_alatt": 0.46,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 5,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-12",
+   "elotav_honap": 2,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "csapadek",
+   "anomalia": 7.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.55,
+   "p_atlag_alatt": 0.45,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 5,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2026-12",
+   "elotav_honap": 2,
+   "terulet": "ALFOLD",
+   "valtozo": "csapadek",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.54,
+   "p_atlag_alatt": 0.46,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 6,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-01",
+   "elotav_honap": 3,
+   "terulet": "Magyarország",
+   "valtozo": "csapadek",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.54,
+   "p_atlag_alatt": 0.46,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 6,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-01",
+   "elotav_honap": 3,
+   "terulet": "NYUGAT",
+   "valtozo": "csapadek",
+   "anomalia": 5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.53,
+   "p_atlag_alatt": 0.47,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 4,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-01",
+   "elotav_honap": 3,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "csapadek",
+   "anomalia": 7.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.56,
+   "p_atlag_alatt": 0.44,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 7,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-01",
+   "elotav_honap": 3,
+   "terulet": "ALFOLD",
+   "valtozo": "csapadek",
+   "anomalia": 8.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.56,
+   "p_atlag_alatt": 0.44,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 5,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-02",
+   "elotav_honap": 4,
+   "terulet": "Magyarország",
+   "valtozo": "csapadek",
+   "anomalia": 8.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "p_atlag_alatt": 0.41,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 8,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-02",
+   "elotav_honap": 4,
+   "terulet": "NYUGAT",
+   "valtozo": "csapadek",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.57,
+   "p_atlag_alatt": 0.43,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 8,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-02",
+   "elotav_honap": 4,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "csapadek",
+   "anomalia": 9.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "p_atlag_alatt": 0.41,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 7,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-02",
+   "elotav_honap": 4,
+   "terulet": "ALFOLD",
+   "valtozo": "csapadek",
+   "anomalia": 10.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.62,
+   "p_atlag_alatt": 0.38,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 8,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-03",
+   "elotav_honap": 5,
+   "terulet": "Magyarország",
+   "valtozo": "csapadek",
+   "anomalia": 9.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "p_atlag_alatt": 0.41,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 8,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-03",
+   "elotav_honap": 5,
+   "terulet": "NYUGAT",
+   "valtozo": "csapadek",
+   "anomalia": 8.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "p_atlag_alatt": 0.41,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 8,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-03",
+   "elotav_honap": 5,
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "csapadek",
+   "anomalia": 9.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.58,
+   "p_atlag_alatt": 0.42,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 8,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  },
+  {
+   "honap": "2027-03",
+   "elotav_honap": 5,
+   "terulet": "ALFOLD",
+   "valtozo": "csapadek",
+   "anomalia": 11.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.61,
+   "p_atlag_alatt": 0.39,
+   "rendszerek_szama": 9,
+   "rendszerek_atlag_felett": 8,
+   "tagok_szama": 662,
+   "forras_id": "F-C3S"
+  }
+ ],
+ "havi_rendszerenkent": [
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "bom",
+   "anomalia": 2.4,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.93,
+   "tagok": 110
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "cmcc",
+   "anomalia": 2.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.95,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "dwd",
+   "anomalia": 1.9,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.89,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "eccc",
+   "anomalia": 0.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.56,
+   "tagok": 20
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "ecmwf",
+   "anomalia": 1.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.82,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "jma",
+   "anomalia": 1.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.77,
+   "tagok": 150
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "meteo_france",
+   "anomalia": 2.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.92,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "ncep",
+   "anomalia": 1.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.76,
+   "tagok": 120
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "homerseklet",
+   "rendszer": "ukmo",
+   "anomalia": 1.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.76,
+   "tagok": 60
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "bom",
+   "anomalia": 1.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "tagok": 110
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "cmcc",
+   "anomalia": 1.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.83,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "dwd",
+   "anomalia": 1.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.83,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "eccc",
+   "anomalia": 0.9,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.68,
+   "tagok": 20
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "ecmwf",
+   "anomalia": 0.9,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.72,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "jma",
+   "anomalia": 1.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.72,
+   "tagok": 150
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "meteo_france",
+   "anomalia": 0.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.73,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "ncep",
+   "anomalia": 2.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.82,
+   "tagok": 120
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "homerseklet",
+   "rendszer": "ukmo",
+   "anomalia": 1.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.72,
+   "tagok": 60
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "bom",
+   "anomalia": 2.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.86,
+   "tagok": 110
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "cmcc",
+   "anomalia": 1.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.72,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "dwd",
+   "anomalia": 1.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.76,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "eccc",
+   "anomalia": 1.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.7,
+   "tagok": 20
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "ecmwf",
+   "anomalia": 2.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.8,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "jma",
+   "anomalia": 0.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.66,
+   "tagok": 150
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "meteo_france",
+   "anomalia": 0.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.65,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "ncep",
+   "anomalia": 1.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.74,
+   "tagok": 120
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "homerseklet",
+   "rendszer": "ukmo",
+   "anomalia": 2.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.78,
+   "tagok": 60
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "bom",
+   "anomalia": 2.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.86,
+   "tagok": 110
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "cmcc",
+   "anomalia": 0.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.6,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "dwd",
+   "anomalia": 1.4,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.74,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "eccc",
+   "anomalia": 1.4,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.68,
+   "tagok": 20
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "ecmwf",
+   "anomalia": 1.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.73,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "jma",
+   "anomalia": 1.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.79,
+   "tagok": 150
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "meteo_france",
+   "anomalia": 1.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.73,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "ncep",
+   "anomalia": 2.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.8,
+   "tagok": 120
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "homerseklet",
+   "rendszer": "ukmo",
+   "anomalia": 2.5,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.82,
+   "tagok": 60
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "bom",
+   "anomalia": 3.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.87,
+   "tagok": 110
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "cmcc",
+   "anomalia": 0.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.62,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "dwd",
+   "anomalia": 1.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.72,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "eccc",
+   "anomalia": 1.3,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.69,
+   "tagok": 20
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "ecmwf",
+   "anomalia": 1.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.81,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "jma",
+   "anomalia": 1.4,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.72,
+   "tagok": 150
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "meteo_france",
+   "anomalia": 1.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.74,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "ncep",
+   "anomalia": 2.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.8,
+   "tagok": 120
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "homerseklet",
+   "rendszer": "ukmo",
+   "anomalia": 2.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.75,
+   "tagok": 60
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "bom",
+   "anomalia": 1.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.79,
+   "tagok": 110
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "cmcc",
+   "anomalia": 1.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.7,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "dwd",
+   "anomalia": 1.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.82,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "eccc",
+   "anomalia": 0.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.56,
+   "tagok": 20
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "ecmwf",
+   "anomalia": 1.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.74,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "jma",
+   "anomalia": 0.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.67,
+   "tagok": 150
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "meteo_france",
+   "anomalia": 0.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.68,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "ncep",
+   "anomalia": 1.8,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.79,
+   "tagok": 120
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "homerseklet",
+   "rendszer": "ukmo",
+   "anomalia": 1.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.65,
+   "tagok": 60
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "bom",
+   "anomalia": -5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.38,
+   "tagok": 110
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "cmcc",
+   "anomalia": -7.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.37,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "dwd",
+   "anomalia": -34.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.09,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "eccc",
+   "anomalia": -21.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.3,
+   "tagok": 20
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "ecmwf",
+   "anomalia": -14.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.29,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "jma",
+   "anomalia": -2.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.43,
+   "tagok": 150
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "meteo_france",
+   "anomalia": -7.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.37,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "ncep",
+   "anomalia": -3.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.42,
+   "tagok": 120
+  },
+  {
+   "honap": "2026-10",
+   "valtozo": "csapadek",
+   "rendszer": "ukmo",
+   "anomalia": -5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.42,
+   "tagok": 60
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "bom",
+   "anomalia": 5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.51,
+   "tagok": 110
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "cmcc",
+   "anomalia": 7.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.58,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "dwd",
+   "anomalia": 13.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.63,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "eccc",
+   "anomalia": 4.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.44,
+   "tagok": 20
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "ecmwf",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.58,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "jma",
+   "anomalia": 5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.51,
+   "tagok": 150
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "meteo_france",
+   "anomalia": 12.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.55,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "ncep",
+   "anomalia": -5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.39,
+   "tagok": 120
+  },
+  {
+   "honap": "2026-11",
+   "valtozo": "csapadek",
+   "rendszer": "ukmo",
+   "anomalia": 3.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.5,
+   "tagok": 60
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "bom",
+   "anomalia": 12.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.63,
+   "tagok": 110
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "cmcc",
+   "anomalia": -2.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.43,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "dwd",
+   "anomalia": 2.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.46,
+   "tagok": 50
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "eccc",
+   "anomalia": 10.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.65,
+   "tagok": 20
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "ecmwf",
+   "anomalia": 8.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "jma",
+   "anomalia": 5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.48,
+   "tagok": 150
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "meteo_france",
+   "anomalia": 12.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "tagok": 51
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "ncep",
+   "anomalia": -2.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.43,
+   "tagok": 120
+  },
+  {
+   "honap": "2026-12",
+   "valtozo": "csapadek",
+   "rendszer": "ukmo",
+   "anomalia": 11.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.6,
+   "tagok": 60
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "bom",
+   "anomalia": 13.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.62,
+   "tagok": 110
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "cmcc",
+   "anomalia": 2.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.46,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "dwd",
+   "anomalia": 7.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.57,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "eccc",
+   "anomalia": 4.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.5,
+   "tagok": 20
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "ecmwf",
+   "anomalia": 7.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "jma",
+   "anomalia": 5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.49,
+   "tagok": 150
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "meteo_france",
+   "anomalia": 8.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "ncep",
+   "anomalia": 10.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.57,
+   "tagok": 120
+  },
+  {
+   "honap": "2027-01",
+   "valtozo": "csapadek",
+   "rendszer": "ukmo",
+   "anomalia": 2.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.5,
+   "tagok": 60
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "bom",
+   "anomalia": 12.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.63,
+   "tagok": 110
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "cmcc",
+   "anomalia": 1.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.47,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "dwd",
+   "anomalia": 4.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.52,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "eccc",
+   "anomalia": 4.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.53,
+   "tagok": 20
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "ecmwf",
+   "anomalia": 9.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.65,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "jma",
+   "anomalia": 11.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.62,
+   "tagok": 150
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "meteo_france",
+   "anomalia": 5.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.54,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "ncep",
+   "anomalia": 8.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "tagok": 120
+  },
+  {
+   "honap": "2027-02",
+   "valtozo": "csapadek",
+   "rendszer": "ukmo",
+   "anomalia": 18.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.76,
+   "tagok": 60
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "bom",
+   "anomalia": 9.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.59,
+   "tagok": 110
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "cmcc",
+   "anomalia": 9.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.63,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "dwd",
+   "anomalia": 11.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.6,
+   "tagok": 50
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "eccc",
+   "anomalia": 17.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.74,
+   "tagok": 20
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "ecmwf",
+   "anomalia": 6.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.56,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "jma",
+   "anomalia": 13.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.65,
+   "tagok": 150
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "meteo_france",
+   "anomalia": -0.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.41,
+   "tagok": 51
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "ncep",
+   "anomalia": 7.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.58,
+   "tagok": 120
+  },
+  {
+   "honap": "2027-03",
+   "valtozo": "csapadek",
+   "rendszer": "ukmo",
+   "anomalia": 8.0,
+   "egyseg": "mm/hónap",
+   "p_atlag_felett": 0.6,
+   "tagok": 60
+  }
+ ],
+ "heti": [
+  {
+   "het": 1,
+   "het_kezdete": "2026-11-05",
+   "het_vege": "2026-11-11",
+   "terulet": "Magyarország",
+   "valtozo": "homerseklet",
+   "anomalia": -2.6,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.0,
+   "p_atlag_alatt": 1.0,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 1,
+   "het_kezdete": "2026-11-05",
+   "het_vege": "2026-11-11",
+   "terulet": "NYUGAT",
+   "valtozo": "homerseklet",
+   "anomalia": -2.4,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.0,
+   "p_atlag_alatt": 1.0,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 1,
+   "het_kezdete": "2026-11-05",
+   "het_vege": "2026-11-11",
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "homerseklet",
+   "anomalia": -2.7,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.0,
+   "p_atlag_alatt": 1.0,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 1,
+   "het_kezdete": "2026-11-05",
+   "het_vege": "2026-11-11",
+   "terulet": "ALFOLD",
+   "valtozo": "homerseklet",
+   "anomalia": -3.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.0,
+   "p_atlag_alatt": 1.0,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 1,
+   "het_kezdete": "2026-11-05",
+   "het_vege": "2026-11-11",
+   "terulet": "Magyarország",
+   "valtozo": "csapadek",
+   "anomalia": -4.2,
+   "egyseg": "mm/hét",
+   "p_atlag_felett": 0.27,
+   "p_atlag_alatt": 0.73,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 1,
+   "het_kezdete": "2026-11-05",
+   "het_vege": "2026-11-11",
+   "terulet": "NYUGAT",
+   "valtozo": "csapadek",
+   "anomalia": -6.0,
+   "egyseg": "mm/hét",
+   "p_atlag_felett": 0.22,
+   "p_atlag_alatt": 0.78,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 1,
+   "het_kezdete": "2026-11-05",
+   "het_vege": "2026-11-11",
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "csapadek",
+   "anomalia": -4.4,
+   "egyseg": "mm/hét",
+   "p_atlag_felett": 0.24,
+   "p_atlag_alatt": 0.76,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 1,
+   "het_kezdete": "2026-11-05",
+   "het_vege": "2026-11-11",
+   "terulet": "ALFOLD",
+   "valtozo": "csapadek",
+   "anomalia": -1.3,
+   "egyseg": "mm/hét",
+   "p_atlag_felett": 0.37,
+   "p_atlag_alatt": 0.63,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 2,
+   "het_kezdete": "2026-11-12",
+   "het_vege": "2026-11-18",
+   "terulet": "Magyarország",
+   "valtozo": "homerseklet",
+   "anomalia": 1.0,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.65,
+   "p_atlag_alatt": 0.35,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 2,
+   "het_kezdete": "2026-11-12",
+   "het_vege": "2026-11-18",
+   "terulet": "NYUGAT",
+   "valtozo": "homerseklet",
+   "anomalia": 1.2,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.71,
+   "p_atlag_alatt": 0.29,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 2,
+   "het_kezdete": "2026-11-12",
+   "het_vege": "2026-11-18",
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "homerseklet",
+   "anomalia": 0.4,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.58,
+   "p_atlag_alatt": 0.42,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 2,
+   "het_kezdete": "2026-11-12",
+   "het_vege": "2026-11-18",
+   "terulet": "ALFOLD",
+   "valtozo": "homerseklet",
+   "anomalia": 1.1,
+   "egyseg": "°C",
+   "p_atlag_felett": 0.64,
+   "p_atlag_alatt": 0.36,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 2,
+   "het_kezdete": "2026-11-12",
+   "het_vege": "2026-11-18",
+   "terulet": "Magyarország",
+   "valtozo": "csapadek",
+   "anomalia": 5.4,
+   "egyseg": "mm/hét",
+   "p_atlag_felett": 0.6,
+   "p_atlag_alatt": 0.4,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 2,
+   "het_kezdete": "2026-11-12",
+   "het_vege": "2026-11-18",
+   "terulet": "NYUGAT",
+   "valtozo": "csapadek",
+   "anomalia": 3.8,
+   "egyseg": "mm/hét",
+   "p_atlag_felett": 0.58,
+   "p_atlag_alatt": 0.42,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 2,
+   "het_kezdete": "2026-11-12",
+   "het_vege": "2026-11-18",
+   "terulet": "KOZEP_ESZAK",
+   "valtozo": "csapadek",
+   "anomalia": 5.8,
+   "egyseg": "mm/hét",
+   "p_atlag_felett": 0.62,
+   "p_atlag_alatt": 0.38,
+   "forras_id": "F-ENS"
+  },
+  {
+   "het": 2,
+   "het_kezdete": "2026-11-12",
+   "het_vege": "2026-11-18",
+   "terulet": "ALFOLD",
+   "valtozo": "csapadek",
+   "anomalia": 7.3,
+   "egyseg": "mm/hét",
+   "p_atlag_felett": 0.61,
+   "p_atlag_alatt": 0.39,
+   "forras_id": "F-ENS"
+  }
+ ],
+ "vizhozam": [
+  {
+   "folyo": "Duna",
+   "szelveny": "Budapest",
+   "honap": "2026-10",
+   "median": 1212.0,
+   "p25": 1106.0,
+   "p75": 1342.0,
+   "klima_atlag": 2143.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -43.5,
+   "p_klima_alatt": 1.0,
+   "elso_nap_median": 1205.0,
+   "cella": [
+    47.375,
+    18.975
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Budapest",
+   "honap": "2026-11",
+   "median": 1341.0,
+   "p25": 1176.0,
+   "p75": 1510.0,
+   "klima_atlag": 1997.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -32.9,
+   "p_klima_alatt": 0.96,
+   "elso_nap_median": 1205.0,
+   "cella": [
+    47.375,
+    18.975
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Budapest",
+   "honap": "2026-12",
+   "median": 1287.0,
+   "p25": 1134.0,
+   "p75": 1396.0,
+   "klima_atlag": 1809.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -28.8,
+   "p_klima_alatt": 0.98,
+   "elso_nap_median": 1205.0,
+   "cella": [
+    47.375,
+    18.975
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Budapest",
+   "honap": "2027-01",
+   "median": 1271.0,
+   "p25": 1056.0,
+   "p75": 1508.0,
+   "klima_atlag": 1904.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -33.2,
+   "p_klima_alatt": 0.94,
+   "elso_nap_median": 1205.0,
+   "cella": [
+    47.375,
+    18.975
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Budapest",
+   "honap": "2027-02",
+   "median": 1519.0,
+   "p25": 1313.0,
+   "p75": 1918.0,
+   "klima_atlag": 1882.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -19.3,
+   "p_klima_alatt": 0.73,
+   "elso_nap_median": 1205.0,
+   "cella": [
+    47.375,
+    18.975
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Budapest",
+   "honap": "2027-03",
+   "median": 1916.0,
+   "p25": 1569.0,
+   "p75": 2368.0,
+   "klima_atlag": 2421.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -20.9,
+   "p_klima_alatt": 0.8,
+   "elso_nap_median": 1205.0,
+   "cella": [
+    47.375,
+    18.975
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Budapest",
+   "honap": "2027-04",
+   "median": 2413.0,
+   "p25": 2050.0,
+   "p75": 2753.0,
+   "klima_atlag": 2801.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -13.9,
+   "p_klima_alatt": 0.78,
+   "elso_nap_median": 1205.0,
+   "cella": [
+    47.375,
+    18.975
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Mohács",
+   "honap": "2026-10",
+   "median": 1295.0,
+   "p25": 1195.0,
+   "p75": 1410.0,
+   "klima_atlag": 2273.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -43.0,
+   "p_klima_alatt": 1.0,
+   "elso_nap_median": 1417.0,
+   "cella": [
+    45.925,
+    18.775
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Mohács",
+   "honap": "2026-11",
+   "median": 1487.0,
+   "p25": 1275.0,
+   "p75": 1630.0,
+   "klima_atlag": 2122.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -29.9,
+   "p_klima_alatt": 0.98,
+   "elso_nap_median": 1417.0,
+   "cella": [
+    45.925,
+    18.775
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Mohács",
+   "honap": "2026-12",
+   "median": 1383.0,
+   "p25": 1265.0,
+   "p75": 1526.0,
+   "klima_atlag": 1921.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -28.0,
+   "p_klima_alatt": 0.98,
+   "elso_nap_median": 1417.0,
+   "cella": [
+    45.925,
+    18.775
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Mohács",
+   "honap": "2027-01",
+   "median": 1420.0,
+   "p25": 1183.0,
+   "p75": 1590.0,
+   "klima_atlag": 2039.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -30.4,
+   "p_klima_alatt": 0.94,
+   "elso_nap_median": 1417.0,
+   "cella": [
+    45.925,
+    18.775
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Mohács",
+   "honap": "2027-02",
+   "median": 1646.0,
+   "p25": 1380.0,
+   "p75": 1983.0,
+   "klima_atlag": 1998.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -17.6,
+   "p_klima_alatt": 0.76,
+   "elso_nap_median": 1417.0,
+   "cella": [
+    45.925,
+    18.775
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Mohács",
+   "honap": "2027-03",
+   "median": 2027.0,
+   "p25": 1665.0,
+   "p75": 2440.0,
+   "klima_atlag": 2497.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -18.8,
+   "p_klima_alatt": 0.82,
+   "elso_nap_median": 1417.0,
+   "cella": [
+    45.925,
+    18.775
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Duna",
+   "szelveny": "Mohács",
+   "honap": "2027-04",
+   "median": 2567.0,
+   "p25": 2097.0,
+   "p75": 2791.0,
+   "klima_atlag": 2922.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -12.1,
+   "p_klima_alatt": 0.78,
+   "elso_nap_median": 1417.0,
+   "cella": [
+    45.925,
+    18.775
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szolnok",
+   "honap": "2026-10",
+   "median": 53.0,
+   "p25": 40.0,
+   "p75": 72.0,
+   "klima_atlag": 322.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -83.7,
+   "p_klima_alatt": 1.0,
+   "elso_nap_median": 52.0,
+   "cella": [
+    47.125,
+    20.175
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szolnok",
+   "honap": "2026-11",
+   "median": 101.0,
+   "p25": 72.0,
+   "p75": 123.0,
+   "klima_atlag": 358.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -71.9,
+   "p_klima_alatt": 0.98,
+   "elso_nap_median": 52.0,
+   "cella": [
+    47.125,
+    20.175
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szolnok",
+   "honap": "2026-12",
+   "median": 113.0,
+   "p25": 77.0,
+   "p75": 146.0,
+   "klima_atlag": 300.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -62.3,
+   "p_klima_alatt": 0.98,
+   "elso_nap_median": 52.0,
+   "cella": [
+    47.125,
+    20.175
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szolnok",
+   "honap": "2027-01",
+   "median": 137.0,
+   "p25": 68.0,
+   "p75": 241.0,
+   "klima_atlag": 279.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -50.8,
+   "p_klima_alatt": 0.8,
+   "elso_nap_median": 52.0,
+   "cella": [
+    47.125,
+    20.175
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szolnok",
+   "honap": "2027-02",
+   "median": 222.0,
+   "p25": 96.0,
+   "p75": 305.0,
+   "klima_atlag": 342.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -35.1,
+   "p_klima_alatt": 0.78,
+   "elso_nap_median": 52.0,
+   "cella": [
+    47.125,
+    20.175
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szolnok",
+   "honap": "2027-03",
+   "median": 418.0,
+   "p25": 279.0,
+   "p75": 607.0,
+   "klima_atlag": 624.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -32.9,
+   "p_klima_alatt": 0.76,
+   "elso_nap_median": 52.0,
+   "cella": [
+    47.125,
+    20.175
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szolnok",
+   "honap": "2027-04",
+   "median": 619.0,
+   "p25": 485.0,
+   "p75": 828.0,
+   "klima_atlag": 838.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -26.1,
+   "p_klima_alatt": 0.75,
+   "elso_nap_median": 52.0,
+   "cella": [
+    47.125,
+    20.175
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szeged",
+   "honap": "2026-10",
+   "median": 86.0,
+   "p25": 73.0,
+   "p75": 115.0,
+   "klima_atlag": 598.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -85.6,
+   "p_klima_alatt": 1.0,
+   "elso_nap_median": 84.0,
+   "cella": [
+    46.175,
+    20.125
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szeged",
+   "honap": "2026-11",
+   "median": 157.0,
+   "p25": 117.0,
+   "p75": 199.0,
+   "klima_atlag": 617.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -74.5,
+   "p_klima_alatt": 0.98,
+   "elso_nap_median": 84.0,
+   "cella": [
+    46.175,
+    20.125
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szeged",
+   "honap": "2026-12",
+   "median": 178.0,
+   "p25": 137.0,
+   "p75": 251.0,
+   "klima_atlag": 560.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -68.2,
+   "p_klima_alatt": 0.98,
+   "elso_nap_median": 84.0,
+   "cella": [
+    46.175,
+    20.125
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szeged",
+   "honap": "2027-01",
+   "median": 204.0,
+   "p25": 128.0,
+   "p75": 369.0,
+   "klima_atlag": 542.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -62.3,
+   "p_klima_alatt": 0.92,
+   "elso_nap_median": 84.0,
+   "cella": [
+    46.175,
+    20.125
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szeged",
+   "honap": "2027-02",
+   "median": 338.0,
+   "p25": 170.0,
+   "p75": 455.0,
+   "klima_atlag": 622.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -45.7,
+   "p_klima_alatt": 0.84,
+   "elso_nap_median": 84.0,
+   "cella": [
+    46.175,
+    20.125
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szeged",
+   "honap": "2027-03",
+   "median": 623.0,
+   "p25": 434.0,
+   "p75": 867.0,
+   "klima_atlag": 1015.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -38.6,
+   "p_klima_alatt": 0.82,
+   "elso_nap_median": 84.0,
+   "cella": [
+    46.175,
+    20.125
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Tisza",
+   "szelveny": "Szeged",
+   "honap": "2027-04",
+   "median": 943.0,
+   "p25": 737.0,
+   "p75": 1344.0,
+   "klima_atlag": 1381.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -31.7,
+   "p_klima_alatt": 0.76,
+   "elso_nap_median": 84.0,
+   "cella": [
+    46.175,
+    20.125
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Dráva",
+   "szelveny": "Barcs",
+   "honap": "2026-10",
+   "median": 150.0,
+   "p25": 130.0,
+   "p75": 188.0,
+   "klima_atlag": 316.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -52.4,
+   "p_klima_alatt": 1.0,
+   "elso_nap_median": 147.0,
+   "cella": [
+    45.925,
+    17.575
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Dráva",
+   "szelveny": "Barcs",
+   "honap": "2026-11",
+   "median": 168.0,
+   "p25": 146.0,
+   "p75": 218.0,
+   "klima_atlag": 291.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -42.2,
+   "p_klima_alatt": 0.9,
+   "elso_nap_median": 147.0,
+   "cella": [
+    45.925,
+    17.575
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Dráva",
+   "szelveny": "Barcs",
+   "honap": "2026-12",
+   "median": 137.0,
+   "p25": 109.0,
+   "p75": 178.0,
+   "klima_atlag": 224.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -38.7,
+   "p_klima_alatt": 0.92,
+   "elso_nap_median": 147.0,
+   "cella": [
+    45.925,
+    17.575
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Dráva",
+   "szelveny": "Barcs",
+   "honap": "2027-01",
+   "median": 102.0,
+   "p25": 85.0,
+   "p75": 124.0,
+   "klima_atlag": 165.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -38.2,
+   "p_klima_alatt": 0.92,
+   "elso_nap_median": 147.0,
+   "cella": [
+    45.925,
+    17.575
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Dráva",
+   "szelveny": "Barcs",
+   "honap": "2027-02",
+   "median": 97.0,
+   "p25": 75.0,
+   "p75": 107.0,
+   "klima_atlag": 145.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -33.2,
+   "p_klima_alatt": 0.94,
+   "elso_nap_median": 147.0,
+   "cella": [
+    45.925,
+    17.575
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Dráva",
+   "szelveny": "Barcs",
+   "honap": "2027-03",
+   "median": 109.0,
+   "p25": 87.0,
+   "p75": 139.0,
+   "klima_atlag": 178.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -38.9,
+   "p_klima_alatt": 0.94,
+   "elso_nap_median": 147.0,
+   "cella": [
+    45.925,
+    17.575
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Dráva",
+   "szelveny": "Barcs",
+   "honap": "2027-04",
+   "median": 171.0,
+   "p25": 131.0,
+   "p75": 232.0,
+   "klima_atlag": 278.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -38.7,
+   "p_klima_alatt": 0.88,
+   "elso_nap_median": 147.0,
+   "cella": [
+    45.925,
+    17.575
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Hármas-Körös",
+   "szelveny": "Gyoma",
+   "honap": "2026-10",
+   "median": 16.0,
+   "p25": 13.0,
+   "p75": 19.0,
+   "klima_atlag": 96.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -83.5,
+   "p_klima_alatt": 1.0,
+   "elso_nap_median": 14.0,
+   "cella": [
+    46.925,
+    20.725
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Hármas-Körös",
+   "szelveny": "Gyoma",
+   "honap": "2026-11",
+   "median": 21.0,
+   "p25": 16.0,
+   "p75": 25.0,
+   "klima_atlag": 100.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -79.2,
+   "p_klima_alatt": 1.0,
+   "elso_nap_median": 14.0,
+   "cella": [
+    46.925,
+    20.725
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Hármas-Körös",
+   "szelveny": "Gyoma",
+   "honap": "2026-12",
+   "median": 21.0,
+   "p25": 18.0,
+   "p75": 28.0,
+   "klima_atlag": 108.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -80.3,
+   "p_klima_alatt": 1.0,
+   "elso_nap_median": 14.0,
+   "cella": [
+    46.925,
+    20.725
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Hármas-Körös",
+   "szelveny": "Gyoma",
+   "honap": "2027-01",
+   "median": 28.0,
+   "p25": 19.0,
+   "p75": 41.0,
+   "klima_atlag": 113.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -75.0,
+   "p_klima_alatt": 0.98,
+   "elso_nap_median": 14.0,
+   "cella": [
+    46.925,
+    20.725
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Hármas-Körös",
+   "szelveny": "Gyoma",
+   "honap": "2027-02",
+   "median": 43.0,
+   "p25": 28.0,
+   "p75": 59.0,
+   "klima_atlag": 120.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -64.6,
+   "p_klima_alatt": 0.94,
+   "elso_nap_median": 14.0,
+   "cella": [
+    46.925,
+    20.725
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Hármas-Körös",
+   "szelveny": "Gyoma",
+   "honap": "2027-03",
+   "median": 74.0,
+   "p25": 54.0,
+   "p75": 100.0,
+   "klima_atlag": 152.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -51.3,
+   "p_klima_alatt": 0.9,
+   "elso_nap_median": 14.0,
+   "cella": [
+    46.925,
+    20.725
+   ],
+   "forras_id": "F-GLOFAS"
+  },
+  {
+   "folyo": "Hármas-Körös",
+   "szelveny": "Gyoma",
+   "honap": "2027-04",
+   "median": 104.0,
+   "p25": 74.0,
+   "p75": 134.0,
+   "klima_atlag": 168.0,
+   "egyseg": "m³/s",
+   "elteres_szazalek": -38.2,
+   "p_klima_alatt": 0.94,
+   "elso_nap_median": 14.0,
+   "cella": [
+    46.925,
+    20.725
+   ],
+   "forras_id": "F-GLOFAS"
+  }
+ ]
+}
