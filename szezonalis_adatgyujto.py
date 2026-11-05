@@ -44,6 +44,7 @@ KULCS_FAJL = pathlib.Path(__file__).resolve().parent / "copernikus.txt"  # tarta
 PARHUZAMOS = int(os.environ.get("PARHUZAMOS", "4"))  # egyszerre futó CDS/EWDS kérések
 # A szezonális GloFAS "operational" jelenleg a v4-es modell (a v4 reanalízis egyezik az előrejelzés 1. napjával)
 GLOFAS_KLIMA_VERZIO = os.environ.get("GLOFAS_KLIMA_VERZIO", "version_4_0")
+GLOFAS_NAP_LEPES = int(os.environ.get("GLOFAS_NAP_LEPES", "3"))  # 1 = minden nap (lassabb: 30 kérés)
 
 PONTOK = [  # név, szélesség, hosszúság, régiócsoport
     ("Győr", 47.68, 17.63, "NYUGAT"),
@@ -330,43 +331,49 @@ def glofas_klima(cl) -> dict:
         return json.loads(gy.read_text(encoding="utf-8"))
     naplo("GloFAS klíma számítása (egyszeri, utána cache-ből)…")
     alap = glofas_valtozo(cl, "cems-glofas-historical", {"year": ["2000"]}, verzio=GLOFAS_KLIMA_VERZIO)
-    havi_osszeg = {f"{f}|{s}": np.zeros(12) for f, s, _, _ in FOLYOK}
-    havi_db = {k: np.zeros(12) for k in havi_osszeg}
-    cellak, verzio = {}, alap.get("system_version", ["?"])[0]
-    with tempfile.TemporaryDirectory() as tmp:
-        def evi(ev: int) -> xr.DataArray:
-            # A nem létező napokat (pl. febr. 30.) a szolgáltatás kihagyja; ha mégis hibát adna, havonta kérjük
-            kozos = dict(alap, year=[str(ev)], area=FOLYO_AREA, data_format="netcdf", download_format="unarchived")
-            try:
-                keres = dict(kozos, month=[f"{m:02d}" for m in range(1, 13)], day=[f"{d:02d}" for d in range(1, 32)])
-                return adatvaltozo(megnyit(letolt(cl, "cems-glofas-historical", keres,
-                                                  pathlib.Path(tmp) / f"gh_{ev}.nc"))).load()
-            except Exception as e:
-                naplo(f"GloFAS historical {ev}: egész éves kérés hibás ({e!r:.200}), havonta próbálom")
-                reszek = []
-                for m in range(1, 13):
-                    keres = dict(kozos, month=[f"{m:02d}"],
-                                 day=[f"{d:02d}" for d in range(1, calendar.monthrange(ev, m)[1] + 1)])
-                    reszek.append(adatvaltozo(megnyit(letolt(cl, "cems-glofas-historical", keres,
-                                                             pathlib.Path(tmp) / f"gh_{ev}_{m:02d}.nc"))).load())
-                return xr.concat(reszek, dim=dim_nev(reszek[0], ("valid_time", "time")))
+    verzio = alap.get("system_version", ["?"])[0]
+    # Az EWDS kérésenként max. 500 mezőt enged (1 év napi adata = 365), és felhasználónként egyszerre egy kérést
+    # futtat. Ezért minden GLOFAS_NAP_LEPES. napot vesszük (alapból 3: 1., 4., …, 31.), így több év fér egy kérésbe.
+    napok = list(range(1, 32, GLOFAS_NAP_LEPES))
+    evek_kereskent = max(1, 480 // (len(napok) * 12))
+    csomagok = [list(range(e, min(e + evek_kereskent, 2021))) for e in range(1991, 2021, evek_kereskent)]
+    reszdir = CACHE / "glofas_reszek"  # részeredmények: megszakítás után innen folytatja
+    reszdir.mkdir(parents=True, exist_ok=True)
 
-        with ThreadPoolExecutor(PARHUZAMOS) as ex:
-            evek = list(ex.map(evi, range(1991, 2021)))
-        for da in evek:
-            latn, lonn = lat_lon(da)
-            tdim = dim_nev(da, ("valid_time", "time"))
-            for f, s, la, lo in FOLYOK:
-                k = f"{f}|{s}"
-                if k not in cellak:
-                    cellak[k] = legnagyobb_folyo_cella(da.mean(tdim), la, lo, latn, lonn)
-                ts = da.sel({latn: cellak[k][0], lonn: cellak[k][1]}, method="nearest").to_series()
-                for m, v in ts.groupby(ts.index.month).mean().items():
-                    havi_osszeg[k][m - 1] += v; havi_db[k][m - 1] += 1
-    klima = {"verzio": verzio, "cellak": cellak,
-             "havi_atlag": {k: list(np.round(havi_osszeg[k] / np.maximum(havi_db[k], 1), 1)) for k in havi_osszeg}}
-    CACHE.mkdir(parents=True, exist_ok=True)
+    def csomag(evek: list[int]) -> pathlib.Path:
+        f = reszdir / f"gh_{GLOFAS_NAP_LEPES}_{evek[0]}_{evek[-1]}.nc"
+        if f.exists():
+            return f
+        keres = dict(alap, year=[str(e) for e in evek], month=[f"{m:02d}" for m in range(1, 13)],
+                     day=[f"{d:02d}" for d in napok], area=FOLYO_AREA, data_format="netcdf",
+                     download_format="unarchived")
+        with tempfile.TemporaryDirectory() as tmp:
+            da = adatvaltozo(megnyit(letolt(cl, "cems-glofas-historical", keres, pathlib.Path(tmp) / "gh.nc"))).load()
+        ideig = f.with_suffix(".tmp")
+        da.to_netcdf(ideig)
+        ideig.rename(f)
+        naplo(f"GloFAS historical {evek[0]}–{evek[-1]} kész")
+        return f
+
+    with ThreadPoolExecutor(PARHUZAMOS) as ex:
+        fajlok = list(ex.map(csomag, csomagok))
+    reszek = [xr.open_dataarray(f).load() for f in fajlok]
+    tdim = dim_nev(reszek[0], ("valid_time", "time"))
+    da = xr.concat(reszek, dim=tdim)
+    latn, lonn = lat_lon(da)
+    atlag = da.mean(tdim)
+    cellak, havi = {}, {}
+    for f, s, la, lo in FOLYOK:
+        k = f"{f}|{s}"
+        cellak[k] = legnagyobb_folyo_cella(atlag, la, lo, latn, lonn)
+        ts = da.sel({latn: cellak[k][0], lonn: cellak[k][1]}, method="nearest").to_series()
+        hm = ts.groupby(ts.index.month).mean()
+        havi[k] = [round(float(hm.get(m, np.nan)), 1) for m in range(1, 13)]
+    klima = {"verzio": verzio, "cellak": cellak, "havi_atlag": havi,
+             "mintavetel": f"minden {GLOFAS_NAP_LEPES}. nap, {da.sizes[tdim]} nap 1991–2020"}
     gy.write_text(json.dumps(klima, ensure_ascii=False, indent=1), encoding="utf-8")
+    for f in fajlok:
+        f.unlink(missing_ok=True)
     return klima
 
 
@@ -418,7 +425,8 @@ def glofas_szezonalis(ev: int, ho: int) -> list:
             hiba(f"GloFAS {k}", e)
     FORRASOK.append({"forras_id": "F-GLOFAS", "nev": "GloFAS szezonális vízhozam-előrejelzés (CEMS)",
                      "dataset": "cems-glofas-seasonal", "parameterek": alap, "inicializalas": f"{ev}-{ho:02d}",
-                     "klima": f"cems-glofas-historical {klima.get('verzio')} 1991–2020",
+                     "klima": f"cems-glofas-historical {klima.get('verzio')} 1991–2020"
+                              + (f" ({klima['mintavetel']})" if klima.get("mintavetel") else ""),
                      "licenc": "CEMS-FLOODS datasets licence",
                      "attribucio": "Copernicus Emergency Management Service – GloFAS"})
     return sorok
@@ -573,19 +581,32 @@ def main() -> int:
     ev, ho = int(os.environ.get("INIT_EV", most.year)), int(os.environ.get("INIT_HO", most.month))
     ki = {"meta": {}, "havi": [], "havi_rendszerenkent": [], "heti": [], "vizhozam": []}
     reszek = {}
-    try:
-        ki["havi"], ki["havi_rendszerenkent"] = c3s_havi(ev, ho); reszek["havi"] = True
-    except Exception as e:
-        hiba("C3S havi", e); reszek["havi"] = False
-    try:
-        ki["vizhozam"] = glofas_szezonalis(ev, ho); reszek["vizhozam"] = bool(ki["vizhozam"])
-    except Exception as e:
-        hiba("GloFAS", e); reszek["vizhozam"] = False
+
+    # A három rész más-más szolgáltatást használ (CDS, EWDS, ECMWF open data), ezért párhuzamosan futnak.
+    def havi_resz():
+        ki["havi"], ki["havi_rendszerenkent"] = c3s_havi(ev, ho)
+        return True
+
+    def vizhozam_resz():
+        ki["vizhozam"] = glofas_szezonalis(ev, ho)
+        return bool(ki["vizhozam"])
+
+    def heti_resz():
+        ki["heti"] = ens_heti(kliens(CDS_URL, ["CDS_KEY", "CDSAPI_KEY"]))
+        return True
+
+    feladatok = {"havi": ("C3S havi", havi_resz), "vizhozam": ("GloFAS", vizhozam_resz)}
     if os.environ.get("HETI", "1") == "1":
-        try:
-            ki["heti"] = ens_heti(kliens(CDS_URL, ["CDS_KEY", "CDSAPI_KEY"])); reszek["heti"] = True
-        except Exception as e:
-            hiba("ENS heti", e); reszek["heti"] = False
+        feladatok["heti"] = ("ENS heti", heti_resz)
+    with ThreadPoolExecutor(len(feladatok)) as ex:
+        jovok = {nev: ex.submit(fv) for nev, (_, fv) in feladatok.items()}
+        for nev, jovo in jovok.items():
+            try:
+                reszek[nev] = jovo.result()
+            except Exception as e:
+                hiba(feladatok[nev][0], e); reszek[nev] = False
+    sorrend = {"F-C3S": 0, "F-GLOFAS": 1, "F-ENS": 2}
+    FORRASOK.sort(key=lambda f: sorrend.get(f.get("forras_id"), 9))
     ki["meta"] = {
         "riport": "Energofish szezonális numerikus adatréteg", "sema_verzio": "1.0",
         "inicializalas_honap": f"{ev}-{ho:02d}", "generalva_utc": most.strftime("%Y-%m-%dT%H:%M:%SZ"),
