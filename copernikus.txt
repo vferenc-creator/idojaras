@@ -1,0 +1,2 @@
+url: https://ewds.climate.copernicus.eu/api
+key: 327b71d0-55f4-47e9-b0e4-10d1d41079f2
