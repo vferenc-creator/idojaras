@@ -28,6 +28,9 @@ import sys
 import tempfile
 import traceback
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
+
+os.environ.setdefault("TQDM_DISABLE", "1")  # ecmwf-opendata letöltési folyamatjelző ki
 
 import numpy as np
 import pandas as pd
@@ -37,6 +40,10 @@ ADAT = pathlib.Path("adat")
 CACHE = ADAT / "cache"
 CDS_URL = "https://cds.climate.copernicus.eu/api"
 EWDS_URL = "https://ewds.climate.copernicus.eu/api"
+KULCS_FAJL = pathlib.Path(__file__).resolve().parent / "copernikus.txt"  # tartalék, ha nincs secret
+PARHUZAMOS = int(os.environ.get("PARHUZAMOS", "4"))  # egyszerre futó CDS/EWDS kérések
+# A szezonális GloFAS "operational" jelenleg a v4-es modell (a v4 reanalízis egyezik az előrejelzés 1. napjával)
+GLOFAS_KLIMA_VERZIO = os.environ.get("GLOFAS_KLIMA_VERZIO", "version_4_0")
 
 PONTOK = [  # név, szélesség, hosszúság, régiócsoport
     ("Győr", 47.68, 17.63, "NYUGAT"),
@@ -96,6 +103,9 @@ def kliens(url: str, kulcs_env: list[str]):
     from ecmwf.datastores import Client
 
     kulcs = next((os.environ[k] for k in kulcs_env if os.environ.get(k)), None)
+    if not kulcs and KULCS_FAJL.exists():  # "url: …" / "key: …" formátum
+        kulcs = next((sor.split(":", 1)[1].strip() for sor in KULCS_FAJL.read_text(encoding="utf-8").splitlines()
+                      if sor.strip().lower().startswith("key")), None)
     if not kulcs:
         raise RuntimeError(f"Hiányzó API-kulcs ({' / '.join(kulcs_env)} secret)")
     return Client(url=url, key=kulcs, progress=False, maximum_tries=50, retry_after=30)
@@ -154,7 +164,7 @@ def c3s_rendszer(cl, kozpont: str, ev: int, ho: int) -> str | None:
 
 def c3s_feldolgoz(da: xr.DataArray, ev: int, ho: int, valtozo: str) -> dict:
     """Visszaad: {(pont, honap): (tag_anomaliak_tomb)} a pontokra; csapadéknál mm/hónap."""
-    for d in ("forecast_reference_time", "time") :
+    for d in ("forecast_reference_time", "indexing_time", "time"):
         if d in da.dims and da.sizes[d] == 1:
             da = da.isel({d: 0})
     tag = dim_nev(da, ("number", "realization", "member"))
@@ -187,25 +197,34 @@ def c3s_havi(ev: int, ho: int) -> tuple[list, list]:
     rendszerenkent = {}  # (kozpont, valtozo) -> {(pont, honap): tagok}
     hasznalt = []
     with tempfile.TemporaryDirectory() as tmp:
+        feladatok = []
         for kozpont in C3S_KOZPONTOK:
             rendszer = c3s_rendszer(cl, kozpont, ev, ho)
             if not rendszer:
                 hiba(f"C3S {kozpont}", "nincs elérhető rendszer erre az indításra (még nem jelent meg?)")
                 continue
-            for valtozo, cds_var in C3S_VALTOZOK.items():
-                try:
-                    p = letolt(cl, "seasonal-postprocessed-single-levels", {
-                        "originating_centre": kozpont, "system": rendszer, "variable": [cds_var],
-                        "product_type": ["monthly_mean"], "year": [str(ev)], "month": [f"{ho:02d}"],
-                        "leadtime_month": [str(i) for i in range(1, 7)], "area": HU_AREA,
-                        "data_format": "netcdf", "download_format": "unarchived",
-                    }, pathlib.Path(tmp) / f"c3s_{kozpont}_{valtozo}.nc")
-                    da = adatvaltozo(megnyit(p)).load()
-                    rendszerenkent[(kozpont, valtozo)] = c3s_feldolgoz(da, ev, ho, valtozo)
-                except Exception as e:
-                    hiba(f"C3S {kozpont} {valtozo}", e)
-            if any(k[0] == kozpont for k in rendszerenkent):
+            feladatok += [(kozpont, rendszer, valtozo, cds_var) for valtozo, cds_var in C3S_VALTOZOK.items()]
+
+        def egy(f):
+            kozpont, rendszer, valtozo, cds_var = f
+            try:
+                p = letolt(cl, "seasonal-postprocessed-single-levels", {
+                    "originating_centre": kozpont, "system": rendszer, "variable": [cds_var],
+                    "product_type": ["monthly_mean"], "year": [str(ev)], "month": [f"{ho:02d}"],
+                    "leadtime_month": [str(i) for i in range(1, 7)], "area": HU_AREA,
+                    "data_format": "netcdf", "download_format": "unarchived",
+                }, pathlib.Path(tmp) / f"c3s_{kozpont}_{valtozo}.nc")
+                da = adatvaltozo(megnyit(p)).load()
+                rendszerenkent[(kozpont, valtozo)] = c3s_feldolgoz(da, ev, ho, valtozo)
+            except Exception as e:
+                hiba(f"C3S {kozpont} {valtozo}", e)
+
+        with ThreadPoolExecutor(PARHUZAMOS) as ex:
+            list(ex.map(egy, feladatok))
+        for kozpont, rendszer, _, _ in feladatok:
+            if any(k[0] == kozpont for k in rendszerenkent) and f"{kozpont}:{rendszer}" not in hasznalt:
                 hasznalt.append(f"{kozpont}:{rendszer}")
+    rendszerenkent = {k: rendszerenkent[k] for k in sorted(rendszerenkent)}  # determinisztikus sorrend
     if not rendszerenkent:
         raise RuntimeError("Egyetlen C3S rendszer sem adott adatot")
     FORRASOK.append({"forras_id": "F-C3S", "nev": "Copernicus C3S multi-modell szezonális előrejelzés",
@@ -249,23 +268,49 @@ def c3s_havi(ev: int, ho: int) -> tuple[list, list]:
 
 
 # --------------------------------------------------------------------------- 2. GloFAS vízhozam
-def glofas_valtozo(cl, gyujtemeny: str, alap: dict) -> dict:
-    """Constraints alapján kiválasztja a ténylegesen elérhető változónevet / verziót."""
-    try:
-        c = cl.apply_constraints(gyujtemeny, alap)
-    except Exception as e:
-        hiba(f"GloFAS constraints {gyujtemeny}", e)
-        c = {}
-    v = c.get("variable") or ["river_discharge_in_the_last_24_hours"]
-    valasz = {"variable": [next((x for x in v if "river_discharge" in x), v[0])]}
-    if c.get("system_version"):
-        sv = c["system_version"]
-        valasz["system_version"] = ["operational"] if "operational" in sv else [sorted(sv)[-1]]
-    if c.get("hydrological_model"):
-        valasz["hydrological_model"] = [c["hydrological_model"][0]]
-    if c.get("product_type"):
-        pt = c["product_type"]
+def _lista(x) -> list[str]:
+    if x is None:
+        return []
+    if isinstance(x, dict):
+        x = list(x)
+    return [str(v) for v in (x if isinstance(x, (list, tuple, set)) else [x])]
+
+
+def glofas_valtozo(cl, gyujtemeny: str, alap: dict, verzio: str | None = None) -> dict:
+    """Constraints alapján kiválasztja a ténylegesen elérhető változónevet / verziót / timespan-t.
+
+    Két lépés: először a vízhozam-változó nevét választjuk ki, utána a változóhoz szűkített
+    constraints-ből a többi mezőt (historicalnál pl. a vízhozam csak timespan=time_mean-nel létezik).
+    """
+    valasz: dict = {}
+    c: dict = {}
+    for lepes in range(2):
+        try:
+            c = dict(cl.apply_constraints(gyujtemeny, dict(alap, **valasz)))
+        except Exception as e:
+            hiba(f"GloFAS constraints {gyujtemeny}", e)
+            break
+        if lepes == 0:
+            v = _lista(c.get("variable")) or ["river_discharge_in_the_last_24_hours"]
+            valasz["variable"] = [next((x for x in v if "river_discharge" in x), v[0])]
+    sv = _lista(c.get("system_version"))
+    if sv:
+        if verzio and verzio in sv:
+            valasz["system_version"] = [verzio]
+        else:
+            valasz["system_version"] = ["operational"] if "operational" in sv else [sorted(sv)[-1]]
+    if _lista(c.get("hydrological_model")):
+        hm = _lista(c["hydrological_model"])
+        valasz["hydrological_model"] = ["lisflood"] if "lisflood" in hm else [hm[0]]
+    if _lista(c.get("product_type")):
+        pt = _lista(c["product_type"])
         valasz["product_type"] = ["consolidated"] if "consolidated" in pt else [pt[0]]
+    if _lista(c.get("timespan")):
+        ts = _lista(c["timespan"])
+        valasz["timespan"] = ["time_mean"] if "time_mean" in ts else [ts[0]]
+    if "variable" not in valasz:
+        valasz["variable"] = ["average_river_discharge_in_the_last_24_hours" if "historical" in gyujtemeny
+                              else "river_discharge_in_the_last_24_hours"]
     return valasz
 
 
@@ -284,17 +329,31 @@ def glofas_klima(cl) -> dict:
     if gy.exists():
         return json.loads(gy.read_text(encoding="utf-8"))
     naplo("GloFAS klíma számítása (egyszeri, utána cache-ből)…")
-    alap = glofas_valtozo(cl, "cems-glofas-historical", {"hyear": ["2000"]})
+    alap = glofas_valtozo(cl, "cems-glofas-historical", {"year": ["2000"]}, verzio=GLOFAS_KLIMA_VERZIO)
     havi_osszeg = {f"{f}|{s}": np.zeros(12) for f, s, _, _ in FOLYOK}
     havi_db = {k: np.zeros(12) for k in havi_osszeg}
     cellak, verzio = {}, alap.get("system_version", ["?"])[0]
     with tempfile.TemporaryDirectory() as tmp:
-        for ev in range(1991, 2021):
-            keres = dict(alap, hyear=[str(ev)], hmonth=[f"{m:02d}" for m in range(1, 13)],
-                         hday=[f"{d:02d}" for d in range(1, 32)], area=FOLYO_AREA,
-                         data_format="netcdf", download_format="unarchived")
-            da = adatvaltozo(megnyit(letolt(cl, "cems-glofas-historical", keres,
-                                            pathlib.Path(tmp) / f"gh_{ev}.nc"))).load()
+        def evi(ev: int) -> xr.DataArray:
+            # A nem létező napokat (pl. febr. 30.) a szolgáltatás kihagyja; ha mégis hibát adna, havonta kérjük
+            kozos = dict(alap, year=[str(ev)], area=FOLYO_AREA, data_format="netcdf", download_format="unarchived")
+            try:
+                keres = dict(kozos, month=[f"{m:02d}" for m in range(1, 13)], day=[f"{d:02d}" for d in range(1, 32)])
+                return adatvaltozo(megnyit(letolt(cl, "cems-glofas-historical", keres,
+                                                  pathlib.Path(tmp) / f"gh_{ev}.nc"))).load()
+            except Exception as e:
+                naplo(f"GloFAS historical {ev}: egész éves kérés hibás ({e!r:.200}), havonta próbálom")
+                reszek = []
+                for m in range(1, 13):
+                    keres = dict(kozos, month=[f"{m:02d}"],
+                                 day=[f"{d:02d}" for d in range(1, calendar.monthrange(ev, m)[1] + 1)])
+                    reszek.append(adatvaltozo(megnyit(letolt(cl, "cems-glofas-historical", keres,
+                                                             pathlib.Path(tmp) / f"gh_{ev}_{m:02d}.nc"))).load())
+                return xr.concat(reszek, dim=dim_nev(reszek[0], ("valid_time", "time")))
+
+        with ThreadPoolExecutor(PARHUZAMOS) as ex:
+            evek = list(ex.map(evi, range(1991, 2021)))
+        for da in evek:
             latn, lonn = lat_lon(da)
             tdim = dim_nev(da, ("valid_time", "time"))
             for f, s, la, lo in FOLYOK:
@@ -373,12 +432,17 @@ def era5_klima(cl) -> dict:
     naplo("ERA5 klíma számítása (egyszeri, utána cache-ből)…")
     ki = {}
     with tempfile.TemporaryDirectory() as tmp:
-        for nev, la, lo, _ in PONTOK:
-            p = letolt(cl, "reanalysis-era5-single-levels-timeseries", {
+        def pont_letolt(i: int) -> pathlib.Path:
+            _, la, lo, _ = PONTOK[i]
+            return letolt(cl, "reanalysis-era5-single-levels-timeseries", {
                 "variable": ["2m_temperature", "total_precipitation"],
                 "location": {"latitude": round(la * 4) / 4, "longitude": round(lo * 4) / 4},
                 "date": ["1991-01-01/2020-12-31"], "data_format": "csv",
-            }, pathlib.Path(tmp) / f"era5_{len(ki)}.csv")
+            }, pathlib.Path(tmp) / f"era5_{i}.csv")
+
+        with ThreadPoolExecutor(PARHUZAMOS) as ex:
+            fajlok = list(ex.map(pont_letolt, range(len(PONTOK))))
+        for (nev, _, _, _), p in zip(PONTOK, fajlok):
             df = pd.read_csv(p)
             tcol = next(c for c in df.columns if "time" in c.lower() or "date" in c.lower())
             t2m = next(c for c in df.columns if c.lower() in ("t2m", "2m_temperature") or "t2m" in c.lower())
@@ -404,21 +468,46 @@ def era5_klima(cl) -> dict:
 def ens_letolt(cel: pathlib.Path) -> tuple[xr.Dataset, xr.Dataset, dt.datetime]:
     from ecmwf.opendata import Client
 
-    c = Client(source=os.environ.get("ECMWF_OPENDATA_SOURCE", "aws"))
+    # Forrás: az ECMWF saját szervere a leggyorsabb; az AWS tükör sok byte-range kérésnél 503 SlowDown-t ad.
+    forrasok = [s for s in os.environ.get("ECMWF_OPENDATA_SOURCE", "ecmwf,azure,google,aws").split(",") if s]
     lepesek_t = list(range(12, 337, 12))
-    res = c.retrieve(time=0, stream="enfo", type=["cf", "pf"], param="2t", step=lepesek_t, target=str(cel / "t.grib2"))
-    c.retrieve(date=res.datetime, time=0, stream="enfo", type=["cf", "pf"], param="tp",
-               step=[168, 336], target=str(cel / "p.grib2"))
     kw = {"engine": "cfgrib", "backend_kwargs": {"indexpath": ""}}
+    utolso_hiba: Exception | None = None
+    for forras in forrasok:
+        try:
+            c = Client(source=forras)
+            # A nyílt ENS-ben jelenleg csak a 50 perturbált tag (pf) van; a cf-et csak akkor vesszük, ha létezik.
+            # (A type=["cf","pf"] listából a kliens csak a pf-et töltötte le.)
+            res = c.retrieve(time=0, stream="enfo", type="pf", param="2t", step=lepesek_t, target=str(cel / "t.grib2"))
+            c.retrieve(date=res.datetime, time=0, stream="enfo", type="pf", param="tp",
+                       step=[168, 336], target=str(cel / "p.grib2"))
+            van_cf = True
+            try:
+                c.retrieve(date=res.datetime, time=0, stream="enfo", type="cf", param="2t", step=lepesek_t,
+                           target=str(cel / "t_cf.grib2"))
+                c.retrieve(date=res.datetime, time=0, stream="enfo", type="cf", param="tp", step=[168, 336],
+                           target=str(cel / "p_cf.grib2"))
+            except Exception:
+                van_cf = False
+            break
+        except Exception as e:
+            utolso_hiba = e
+            naplo(f"ENS letöltés ({forras}) sikertelen: {e!r:.300}")
+    else:
+        raise RuntimeError(f"ENS letöltés minden forrásból sikertelen: {utolso_hiba!r}")
 
-    def tagok(f):
-        cf = xr.open_dataset(f, filter_by_keys={"dataType": "cf"}, **kw)
-        pf = xr.open_dataset(f, filter_by_keys={"dataType": "pf"}, **kw)
+    def tagok(nev):
+        pf = xr.open_dataset(cel / f"{nev}.grib2", **kw)
+        if "number" not in pf.dims:
+            pf = pf.expand_dims("number")
+        if not van_cf:
+            return pf
+        cf = xr.open_dataset(cel / f"{nev}_cf.grib2", **kw)
         if "number" not in cf.dims:
             cf = cf.expand_dims("number")
         return xr.concat([cf, pf], dim="number", coords="minimal", compat="override")
 
-    t, p = tagok(cel / "t.grib2"), tagok(cel / "p.grib2")
+    t, p = tagok("t"), tagok("p")
     return t, p, res.datetime
 
 
@@ -426,8 +515,15 @@ def ens_heti(cl_cds, letolto=ens_letolt) -> list:
     klima = era5_klima(cl_cds)
     with tempfile.TemporaryDirectory() as tmp:
         t_ds, p_ds, indulas = letolto(pathlib.Path(tmp))
-        t = adatvaltozo(t_ds).load() - 273.15
-        p = adatvaltozo(p_ds).load() * 1000.0
+
+        def kivag(da: xr.DataArray) -> xr.DataArray:  # csak Magyarország környéke kerül memóriába
+            la, lo = lat_lon(da)
+            n, w, s_, e = HU_AREA
+            lat_sl = slice(n, s_) if da[la][0] > da[la][-1] else slice(s_, n)
+            return da.sel({la: lat_sl, lo: slice(w, e)})
+
+        t = kivag(adatvaltozo(t_ds)).load() - 273.15
+        p = kivag(adatvaltozo(p_ds)).load() * 1000.0
     latn, lonn = lat_lon(t)
     sorok = []
     for het in (1, 2):
@@ -462,7 +558,8 @@ def ens_heti(cl_cds, letolto=ens_letolt) -> list:
                     "egyseg": "°C" if valtozo == "homerseklet" else "mm/hét",
                     "p_atlag_felett": r(pr), "p_atlag_alatt": r(1 - pr), "forras_id": "F-ENS",
                 })
-    FORRASOK.append({"forras_id": "F-ENS", "nev": "ECMWF nyílt ENS (51 tag, 15 nap)",
+    tagszam = int(t.sizes.get("number", 1))
+    FORRASOK.append({"forras_id": "F-ENS", "nev": f"ECMWF nyílt ENS ({tagszam} tag, 15 nap)",
                      "inicializalas": indulas.strftime("%Y-%m-%d %H UTC"),
                      "modszer": "Nyers ensemble a ERA5 1991–2020 napi klímához (00/12 UTC) mérve; modellhiba nincs korrigálva",
                      "licenc": "CC BY 4.0 (ECMWF open data); ERA5: Copernicus licence",
