@@ -1,7 +1,13 @@
 # energofish-szezonalis-adat
 
 Havonta (10-én 18:00 UTC) lefutó GitHub Actions adatgyűjtő az Energofish szezonális kitekintéséhez.
-Eredmény: `adat/latest.json` (és archív `adat/szezonalis_numerikus_ÉÉÉÉ-HH.json`). Ezt olvassa be a Claude ütemezett feladata 11-én.
+Eredmény: `adat/latest.json` (és archív `adat/szezonalis_numerikus_ÉÉÉÉ-HH.json`). Ezt olvassa be a Claude ütemezett feladata 11-én:
+`https://raw.githubusercontent.com/vferenc-creator/idojaras/main/adat/latest.json`
+
+**Élő API-val tesztelt beállítások (2026-11):**
+- API-kulcs: a `CDS_KEY` secret; ha nincs beállítva, a szkript a repó gyökerében lévő `copernikus.txt` `key:` sorát használja (a CDS és az EWDS ugyanazt a kulcsot fogadja el).
+- GloFAS klíma: `cems-glofas-historical`, `version_4_0`, `consolidated`, `timespan=time_mean` (a szezonális "operational" a v4-es modell). Az EWDS felhasználónként egyszerre egy kérést futtat, ezért a klíma kiszámítása ~1,5–2 óra; az eredmény az `adat/cache/`-ben van, utána nem kell újra.
+- ENS: az ECMWF nyílt adatban jelenleg csak az 50 perturbált tag (pf) érhető el; forrás alapból `data.ecmwf.int` (az AWS tükör 503 SlowDown-t ad). Felülírható: `ECMWF_OPENDATA_SOURCE=aws,google`.
 
 | Rész | Forrás | Licenc |
 |---|---|---|
