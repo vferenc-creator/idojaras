@@ -30,6 +30,7 @@ import time
 import traceback
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeout
 
 os.environ.setdefault("TQDM_DISABLE", "1")  # ecmwf-opendata letöltési folyamatjelző ki
 
@@ -702,13 +703,28 @@ def main() -> int:
     feladatok = {"havi": ("C3S havi", havi_resz), "vizhozam": ("GloFAS", vizhozam_resz)}
     if os.environ.get("HETI", "1") == "1":
         feladatok["heti"] = ("ENS heti", heti_resz)
-    with ThreadPoolExecutor(len(feladatok)) as ex:
-        jovok = {nev: ex.submit(fv) for nev, (_, fv) in feladatok.items()}
-        for nev, jovo in jovok.items():
-            try:
-                reszek[nev] = jovo.result()
-            except Exception as e:
-                hiba(feladatok[nev][0], e); reszek[nev] = False
+    # Teljes futási határidő: ha egy rész (pl. az EWDS sora miatt) nem végez időben, a kész részekkel írjuk ki
+    # az eredményt, mielőtt a GitHub Actions job-időkorlátja (300 perc) mindent leállítana.
+    hatarido = dt.datetime.now() + dt.timedelta(minutes=float(os.environ.get("MAX_FUTAS_PERC", "270")))
+    ex = ThreadPoolExecutor(len(feladatok))
+    jovok = {nev: ex.submit(fv) for nev, (_, fv) in feladatok.items()}
+    idotullepes = False
+    for nev, jovo in jovok.items():
+        try:
+            reszek[nev] = jovo.result(timeout=max(1.0, (hatarido - dt.datetime.now()).total_seconds()))
+        except FuturesTimeout:
+            idotullepes = True
+            hiba(feladatok[nev][0], "időtúllépés: nem végzett a futási határidőig (MAX_FUTAS_PERC); "
+                                    "a következő futás folytatja"); reszek[nev] = False
+        except Exception as e:
+            hiba(feladatok[nev][0], e); reszek[nev] = False
+    ex.shutdown(wait=not idotullepes, cancel_futures=True)
+    if idotullepes:  # a félbemaradt rész eredménye ne kerüljön be félkészen
+        for nev, ertek in reszek.items():
+            if not ertek:
+                ki[nev] = []
+                if nev == "havi":
+                    ki["havi_rendszerenkent"] = []
     sorrend = {"F-C3S": 0, "F-GLOFAS": 1, "F-ENS": 2}
     FORRASOK.sort(key=lambda f: sorrend.get(f.get("forras_id"), 9))
     ki["meta"] = {
@@ -724,7 +740,11 @@ def main() -> int:
     (ADAT / f"szezonalis_numerikus_{ev}-{ho:02d}.json").write_text(szoveg, encoding="utf-8")
     (ADAT / "latest.json").write_text(szoveg, encoding="utf-8")
     naplo(f"Kész. Részek: {reszek}; hibák: {len(HIBAK)}")
-    return 0 if any(reszek.values()) else 1
+    kod = 0 if any(reszek.values()) else 1
+    if idotullepes:  # a még futó letöltő szálak ne tartsák életben a folyamatot
+        sys.stdout.flush(); sys.stderr.flush()
+        os._exit(kod)
+    return kod
 
 
 if __name__ == "__main__":
