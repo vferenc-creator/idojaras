@@ -683,7 +683,9 @@ def ens_heti(cl_cds, letolto=ens_letolt) -> list:
 # --------------------------------------------------------------------------- futtatás
 def main() -> int:
     most = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
-    ev, ho = int(os.environ.get("INIT_EV", most.year)), int(os.environ.get("INIT_HO", most.month))
+    # A C3S a hónap 10-én 12 UTC-kor publikál: korábban (pl. kézi futásnál) az előző, már elérhető hónap az indítás
+    alap_ev, alap_ho = (most.year, most.month) if (most.day, most.hour) >= (10, 12) else honap_plusz(most.year, most.month, -1)
+    ev, ho = int(os.environ.get("INIT_EV") or alap_ev), int(os.environ.get("INIT_HO") or alap_ho)
     ki = {"meta": {}, "havi": [], "havi_rendszerenkent": [], "heti": [], "vizhozam": []}
     reszek = {}
 
