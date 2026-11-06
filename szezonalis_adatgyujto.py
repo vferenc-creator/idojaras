@@ -80,16 +80,47 @@ HIBAK: list[str] = []
 FORRASOK: list[dict] = []
 
 
+KULCS_VALTOZOK = ("CDS_KEY", "EWDS_KEY", "CDSAPI_KEY")
+
+
+def kulcs_tisztit(nyers: str) -> str:
+    """A secret lehet nyers kulcs vagy .cdsapirc-tartalom ("url: …" és "key: …" sorok)."""
+    for sor in nyers.splitlines():
+        if sor.strip().lower().startswith("key:"):
+            return sor.split(":", 1)[1].strip()
+    return nyers.strip()
+
+
+def _titkok() -> list[str]:
+    t: set[str] = set()
+    for k in KULCS_VALTOZOK:
+        v = os.environ.get(k)
+        if v:
+            t.update({v, v.strip(), kulcs_tisztit(v), repr(v)[1:-1]})
+            t.update(sor.strip() for sor in v.splitlines())
+    return sorted((x for x in t if len(x) >= 8), key=len, reverse=True)
+
+
+TITKOK = _titkok()
+
+
+def kitakar(szoveg: str) -> str:
+    """API-kulcs soha ne kerüljön naplóba vagy a kimeneti JSON-ba."""
+    for titok in TITKOK:
+        szoveg = szoveg.replace(titok, "***")
+    return szoveg
+
+
 def naplo(msg: str) -> None:
-    print(f"[{dt.datetime.now(dt.timezone.utc).replace(tzinfo=None):%H:%M:%S}] {msg}", flush=True)
+    print(kitakar(f"[{dt.datetime.now(dt.timezone.utc).replace(tzinfo=None):%H:%M:%S}] {msg}"), flush=True)
 
 
 def hiba(resz: str, exc: BaseException | str) -> None:
-    szoveg = f"{resz}: {exc if isinstance(exc, str) else repr(exc)}"
+    szoveg = kitakar(f"{resz}: {exc if isinstance(exc, str) else repr(exc)}")
     HIBAK.append(szoveg[:500])
     naplo("HIBA " + szoveg)
     if not isinstance(exc, str):
-        traceback.print_exc()
+        print(kitakar(traceback.format_exc()), file=sys.stderr, flush=True)
 
 
 def honap_plusz(ev: int, ho: int, n: int) -> tuple[int, int]:
@@ -105,7 +136,7 @@ def r(x, n=2):
 def kliens(url: str, kulcs_env: list[str]):
     from ecmwf.datastores import Client
 
-    kulcs = next((os.environ[k] for k in kulcs_env if os.environ.get(k)), None)
+    kulcs = next((kulcs_tisztit(os.environ[k]) for k in kulcs_env if os.environ.get(k, "").strip()), None)
     if not kulcs:
         raise RuntimeError(f"Hiányzó API-kulcs ({' / '.join(kulcs_env)} secret)")
     return Client(url=url, key=kulcs, progress=False, maximum_tries=50, retry_after=30)
@@ -734,7 +765,7 @@ def main() -> int:
         "adatforrasok": FORRASOK, "hibak": HIBAK,
     }
     ADAT.mkdir(parents=True, exist_ok=True)
-    szoveg = json.dumps(ki, ensure_ascii=False, indent=1)
+    szoveg = kitakar(json.dumps(ki, ensure_ascii=False, indent=1))
     (ADAT / f"szezonalis_numerikus_{ev}-{ho:02d}.json").write_text(szoveg, encoding="utf-8")
     (ADAT / "latest.json").write_text(szoveg, encoding="utf-8")
     naplo(f"Kész. Részek: {reszek}; hibák: {len(HIBAK)}")
