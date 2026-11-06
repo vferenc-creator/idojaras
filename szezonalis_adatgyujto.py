@@ -26,6 +26,7 @@ import os
 import pathlib
 import sys
 import tempfile
+import threading
 import time
 import traceback
 import zipfile
@@ -154,6 +155,16 @@ def letolt(cl, gyujtemeny: str, keres: dict, cel: pathlib.Path) -> pathlib.Path:
     return cel
 
 
+# A HDF5/netCDF4 és az ecCodes nem szálbiztos: a részek párhuzamosan töltenek le, de fájlt egyszerre csak egy szál
+# nyithat meg / olvashat be (párhuzamos megnyitásnál szegmentációs hiba volt).
+FAJL_ZAR = threading.RLock()
+
+
+def beolvas(p: pathlib.Path) -> xr.DataArray:
+    with FAJL_ZAR:
+        return adatvaltozo(megnyit(p)).load()
+
+
 def megnyit(p: pathlib.Path) -> xr.Dataset:
     if p.suffix in (".grib", ".grib2"):
         return xr.open_dataset(p, engine="cfgrib", backend_kwargs={"indexpath": ""})
@@ -245,7 +256,7 @@ def c3s_havi(ev: int, ho: int) -> tuple[list, list]:
                     "leadtime_month": [str(i) for i in range(1, 7)], "area": HU_AREA,
                     "data_format": "netcdf", "download_format": "unarchived",
                 }, pathlib.Path(tmp) / f"c3s_{kozpont}_{valtozo}.nc")
-                da = adatvaltozo(megnyit(p)).load()
+                da = beolvas(p)
                 rendszerenkent[(kozpont, valtozo)] = c3s_feldolgoz(da, ev, ho, valtozo)
             except Exception as e:
                 hiba(f"C3S {kozpont} {valtozo}", e)
@@ -452,7 +463,7 @@ def glofas_klima(cl) -> dict:
                             nev = next(n for n in z.namelist() if n.endswith((".nc", ".grib", ".grib2")))
                             cel = cel.with_name(pathlib.Path(nev).name)
                             cel.write_bytes(z.read(nev))
-                    da = adatvaltozo(megnyit(cel)).load()
+                    da = beolvas(cel)
                 (reszdir / f"{k}.json").write_text(json.dumps(_glofas_csomag_osszegzes(da)), encoding="utf-8")
                 naplo(f"GloFAS historical {c[0]}–{c[-1]} kész")
                 continue
@@ -507,8 +518,7 @@ def glofas_szezonalis(ev: int, ho: int) -> list:
             keres = dict(alap, year=[str(ev)], month=[f"{ho:02d}"],
                          leadtime_hour=[str(h) for h in lepesek[i:i + darab]], area=FOLYO_AREA,
                          data_format="netcdf", download_format="unarchived")
-            reszek.append(adatvaltozo(megnyit(letolt(cl, "cems-glofas-seasonal", keres,
-                                                     pathlib.Path(tmp) / f"gs_{i}.nc"))).load())
+            reszek.append(beolvas(letolt(cl, "cems-glofas-seasonal", keres, pathlib.Path(tmp) / f"gs_{i}.nc")))
     elso_dim = dim_nev(reszek[0], ("forecast_period", "step", "valid_time", "time"))
     da = xr.concat(reszek, dim=elso_dim) if len(reszek) > 1 else reszek[0]
     try:
@@ -647,7 +657,8 @@ def ens_letolt(cel: pathlib.Path) -> tuple[xr.Dataset, xr.Dataset, dt.datetime]:
             cf = cf.expand_dims("number")
         return xr.concat([cf, pf], dim="number", coords="minimal", compat="override")
 
-    t, p = tagok("t"), tagok("p")
+    with FAJL_ZAR:
+        t, p = tagok("t"), tagok("p")
     return t, p, res.datetime
 
 
@@ -662,8 +673,9 @@ def ens_heti(cl_cds, letolto=ens_letolt) -> list:
             lat_sl = slice(n, s_) if da[la][0] > da[la][-1] else slice(s_, n)
             return da.sel({la: lat_sl, lo: slice(w, e)})
 
-        t = kivag(adatvaltozo(t_ds)).load() - 273.15
-        p = kivag(adatvaltozo(p_ds)).load() * 1000.0
+        with FAJL_ZAR:
+            t = kivag(adatvaltozo(t_ds)).load() - 273.15
+            p = kivag(adatvaltozo(p_ds)).load() * 1000.0
     latn, lonn = lat_lon(t)
     sorok = []
     for het in (1, 2):
