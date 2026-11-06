@@ -1,0 +1,39 @@
+name: Havi szezonális adatgyűjtés
+
+on:
+  schedule:
+    # Minden hónap 10-én 18:00 UTC-kor (a C3S 10-én 12 UTC-kor frissül)
+    - cron: "0 18 10 * *"
+  workflow_dispatch:
+    inputs:
+      heti:
+        description: "Heti (15 napos) ENS-rész futtatása"
+        default: "1"
+
+permissions:
+  contents: write
+
+jobs:
+  adatgyujtes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Csomagok
+        run: pip install -r requirements.txt
+      - name: Adatgyűjtés és számítás
+        env:
+          CDS_KEY: ${{ secrets.CDS_KEY }}
+          EWDS_KEY: ${{ secrets.EWDS_KEY }}
+          HETI: ${{ github.event.inputs.heti || '1' }}
+        run: python szezonalis_adatgyujto.py
+      - name: Eredmény mentése a repóba
+        run: |
+          git config user.name "energofish-adatgyujto"
+          git config user.email "actions@users.noreply.github.com"
+          git add adat/
+          git commit -m "Szezonális adatok $(date -u +%Y-%m-%d)" || echo "Nincs változás"
+          git push
