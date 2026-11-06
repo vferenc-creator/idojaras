@@ -42,7 +42,6 @@ ADAT = pathlib.Path("adat")
 CACHE = ADAT / "cache"
 CDS_URL = "https://cds.climate.copernicus.eu/api"
 EWDS_URL = "https://ewds.climate.copernicus.eu/api"
-KULCS_FAJL = pathlib.Path(__file__).resolve().parent / "copernikus.txt"  # tartalék, ha nincs secret
 PARHUZAMOS = int(os.environ.get("PARHUZAMOS", "4"))  # egyszerre futó CDS/EWDS kérések
 # A szezonális GloFAS "operational" jelenleg a v4-es modell (a v4 reanalízis egyezik az előrejelzés 1. napjával)
 GLOFAS_KLIMA_VERZIO = os.environ.get("GLOFAS_KLIMA_VERZIO", "version_4_0")
@@ -107,9 +106,6 @@ def kliens(url: str, kulcs_env: list[str]):
     from ecmwf.datastores import Client
 
     kulcs = next((os.environ[k] for k in kulcs_env if os.environ.get(k)), None)
-    if not kulcs and KULCS_FAJL.exists():  # "url: …" / "key: …" formátum
-        kulcs = next((sor.split(":", 1)[1].strip() for sor in KULCS_FAJL.read_text(encoding="utf-8").splitlines()
-                      if sor.strip().lower().startswith("key")), None)
     if not kulcs:
         raise RuntimeError(f"Hiányzó API-kulcs ({' / '.join(kulcs_env)} secret)")
     return Client(url=url, key=kulcs, progress=False, maximum_tries=50, retry_after=30)
